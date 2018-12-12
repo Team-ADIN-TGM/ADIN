@@ -33,6 +33,7 @@
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
                         <?php
+                            echo var_dump($userdata);
                     }
                 }
             ?>
