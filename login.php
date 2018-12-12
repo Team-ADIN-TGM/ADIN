@@ -14,8 +14,8 @@
 
   <?php
   if(isset($_POST["submitLogin"])) {
-    $benutzer = mysqli_real_escape_string($conn, $_POST["Email"]);
-    $passwort = mysqli_real_escape_string($conn, $_POST["password"]);
+    $benutzer = mysqli_real_escape_string($conn, $_POST["benutzername"]);
+    $passwort = mysqli_real_escape_string($conn, $_POST["passwort"]);
     
       //Durchführen der SQL-Abfrage
       $sql = "SELECT Email, password FROM Users_tbl WHERE Email='$benutzer' AND password='$passwort'";
