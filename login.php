@@ -9,7 +9,7 @@
     </head>
     <body>
         <form action="login.php" method="post">
-            <p>Benutzername:</p>
+            <p>E-Mail:</p>
             <input type="text" name="username">
             <p>Passwort:</p>
             <input type="password" name="password">
@@ -20,14 +20,14 @@
                     $password = $conn->real_escape_string($_POST["password"]);
 
                     //Durchführen der SQL-Abfrage
-                    $sql = "SELECT Email, password FROM Users_tbl WHERE Email='$benutzer' AND password='$passwort'";
+                    $sql = "SELECT * FROM Users_tbl WHERE Email='$benutzer' AND password='$passwort'";
                     $result_obj = $conn->query($sql);
                     $userdata = $result_obj->fetch_assoc();
 
                     //Überprüfen ob der Login richtig ist
                     if ($result_obj->num_rows > 0) {
                         session_start();
-                        $_SESSION["user"] = $userdata["UserId"];
+                        $_SESSION["user"] = $userdata["UserID"];
                         header("Location: index.php");
                     } else {
                         ?>
