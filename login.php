@@ -20,7 +20,7 @@
                     $password = $conn->real_escape_string($_POST["password"]);
 
                     //Durchführen der SQL-Abfrage
-                    $sql = "SELECT * FROM Users_tbl WHERE Email='$benutzer';";
+                    $sql = "SELECT * FROM Users_tbl WHERE Email='$username';";
                     # AND password='$passwort'
                     $result_obj = $conn->query($sql);
                     $userdata = $result_obj->fetch_assoc();
