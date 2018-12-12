@@ -20,7 +20,8 @@
                     $password = $conn->real_escape_string($_POST["password"]);
 
                     //Durchführen der SQL-Abfrage
-                    $sql = "SELECT * FROM Users_tbl WHERE Email='$benutzer' AND password='$passwort'";
+                    $sql = "SELECT * FROM Users_tbl WHERE Email='$benutzer';";
+                    # AND password='$passwort'
                     $result_obj = $conn->query($sql);
                     $userdata = $result_obj->fetch_assoc();
 
@@ -33,7 +34,8 @@
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
                         <?php
-                            echo var_dump($userdata);
+                            echo("SQL Query".$sql);
+                            var_dump($userdata);
                     }
                 }
             ?>
