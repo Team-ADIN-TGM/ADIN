@@ -6,7 +6,11 @@ $ vi connect.php
 
 ```
 <?php
-$conn = new mysqli("localhost", 'user', 'passwort' , "database");
-if ($conn->connect_error) die("Connection ERROR");
+    $dbhost = "localhost";
+    $dbusername = "username";
+    $dbpassword = "p@ssw0rd";
+    $dbdatabase = "mydatabase";
+    
+    $conn = new mysqli($dbhost, $dbusername, $dbpassword, $dbdatabase);
 ?>
 ```
