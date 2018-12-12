@@ -1,5 +1,4 @@
 <?php
-  session_start();
   include 'connect.php';
 ?>
 <!DOCTYPE html>
@@ -23,11 +22,12 @@
                     //Durchführen der SQL-Abfrage
                     $sql = "SELECT Email, password FROM Users_tbl WHERE Email='$benutzer' AND password='$passwort'";
                     $result_obj = $conn->query($sql);
-                    $result_map = $result_obj->fetch_assoc();
+                    $userdata = $result_obj->fetch_assoc();
 
                     //Überprüfen ob der Login richtig ist
                     if ($result_obj->num_rows > 0) {
-                        $_SESSION["benutzer"] = $user["UserId"];
+                        session_start();
+                        $_SESSION["user"] = $userdata["UserId"];
                         header("Location: index.php");
                     } else {
                         ?>
