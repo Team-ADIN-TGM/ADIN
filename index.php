@@ -1,7 +1,6 @@
 <?php
  session_start();
  include 'connect.php';
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -14,24 +13,16 @@
    
     if(isset($_SESSION["user"])) {
 ?>
-        <p>Sie sind erfolgreich angemeldet</p>
-<?php
-    } else {
-?>
-        <p>Sie sind nicht angemeldet!</p>
-<?php
-    }
-?>
+    <p>Sie sind erfolgreich angemeldet</p>
+    <form action="index.php" method="post">
 
-
-
-<a href="login.php">Login</a>
-<form action="index.php" method="post">
-    <p><button type="submit" name="logout">Logout</button></p>
-</form>
+        <button type="submit" name="mailbox">Mailboxen Verwaltung</button>
+        <button type="submit" name="userconf">Benutzer Verwaltung</button>
+        <button type="submit" name="groupconf">Gruppenmailbox Verwaltung</button>
+        <button type="submit" name="logout">Logout</button>
+    </form>
 </body>
 </html>
-
 
 <?php
 if(isset($_POST["logout"])) {
@@ -39,4 +30,23 @@ if(isset($_POST["logout"])) {
     unset($_SESSION['user']);
     header("Location: login.php");
 }
+if(isset($_POST["userconf"])) {
+    header("Location: user.php");
+}
+if(isset($_POST["groupconf"])) {
+    header("Location: group.php");
+}
 ?>
+
+<?php
+    } else {
+?>
+        <p>Sie sind nicht angemeldet!</p>
+        <a href="login.php">Login</a>
+<?php
+    }
+?>
+
+
+
+
