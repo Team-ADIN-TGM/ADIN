@@ -28,7 +28,10 @@
 if(isset($_POST["logout"])) {
     session_destroy();
     unset($_SESSION['user']);
-    header("Location: login.php");
+    header("Location: ../login.php");
+}
+if(isset($_POST["mailbox"])) {
+    header("Location: mail.php");
 }
 if(isset($_POST["userconf"])) {
     header("Location: user.php");
@@ -42,7 +45,7 @@ if(isset($_POST["groupconf"])) {
     } else {
 ?>
         <p>Sie sind nicht angemeldet!</p>
-        <a href="login.php">Login</a>
+        <a href="../login.php">Login</a>
 <?php
     }
 ?>

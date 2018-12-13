@@ -29,7 +29,7 @@
                     if ($result_obj->num_rows > 0) {
                         
                         $_SESSION["user"] = $userdata["UserId"];
-                        header("Location: index.php");
+                        header("Location: ./superuser/index.php");
                     } else {
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
