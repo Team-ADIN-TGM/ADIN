@@ -1,3 +1,7 @@
+<?php
+ include 'connect.php';
+ session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,8 +10,7 @@
 </head>
 <body>
 <?php
-    include 'connect.php';
-    session_start();
+   
     if(isset($_SESSION["user"])) {
 ?>
         <p>Sie sind erfolgreich angemeldet</p>
@@ -18,5 +21,6 @@
 <?php
     }
 ?>
+<a href="login.php">Login</a>
 </body>
 </html>

@@ -1,4 +1,5 @@
 <?php
+  session_start();
   include 'connect.php';
 ?>
 <!DOCTYPE html>
@@ -26,7 +27,7 @@
 
                     //Überprüfen ob der Login richtig ist
                     if ($result_obj->num_rows > 0) {
-                        session_start();
+                        
                         $_SESSION["user"] = $userdata["UserID"];
                         header("Location: index.php");
                     } else {
