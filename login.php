@@ -29,7 +29,7 @@
                     //Überprüfen ob der Login richtig ist
                     if ($result_obj->num_rows > 0) {
                         
-                        $_SESSION["user"] = $userdata["UserID"];
+                        $_SESSION["user"] = $userdata["UserId"];
                         echo "Hallo ",$_SESSION["user"],"!";
                         # header("Location: index.php");
                     } else {
