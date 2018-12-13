@@ -1,7 +1,7 @@
 <?php
  session_start();
  include 'connect.php';
- if(isset($_SESSION["user"])) {
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,10 +12,16 @@
 <body>
 <?php
    
-
+    if(isset($_SESSION["user"])) {
 ?>
         <p>Sie sind erfolgreich angemeldet</p>
-
+<?php
+    } else {
+?>
+        <p>Sie sind nicht angemeldet!</p>
+<?php
+    }
+?>
 
 
 
@@ -25,20 +31,12 @@
 </form>
 </body>
 </html>
-<?php
- } else {
-     ?>
-     <p>Sie sind nicht angemeldet!</p>
-     <?php
- }
-?>
+
 
 <?php
 if(isset($_POST["logout"])) {
-    echo "hallo";
     session_destroy();
     unset($_SESSION['user']);
     header("Location: login.php");
 }
 ?>
-
