@@ -21,6 +21,16 @@
 <?php
     }
 ?>
+
+<?php
+	if(isset($_POST["logout"])) {
+		session_destroy();
+		header("Location: login.php");
+	}
+?>
+
 <a href="login.php">Login</a>
+<p><button type="submit" name="Logout">Logout</button></p>
+<a href=""></a>
 </body>
 </html>
