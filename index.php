@@ -24,13 +24,16 @@
 
 <?php
 	if(isset($_POST["logout"])) {
+		echo "hallo";
 		session_destroy();
+		unset($_SESSION['user']);
 		header("Location: login.php");
 	}
 ?>
 
 <a href="login.php">Login</a>
-<p><button type="submit" name="Logout">Logout</button></p>
-<a href=""></a>
+<form action="index.php" method="post">
+    <p><button type="submit" name="logout">Logout</button></p>
+</form>
 </body>
 </html>
