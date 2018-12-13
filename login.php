@@ -24,14 +24,12 @@
                     $sql = "SELECT * FROM Users_tbl WHERE Email='$username' AND password='$password';";
                     $result_obj = $conn->query($sql);
                     $userdata = $result_obj->fetch_assoc();
-                    var_dump($userdata);
 
                     //Überprüfen ob der Login richtig ist
                     if ($result_obj->num_rows > 0) {
                         
                         $_SESSION["user"] = $userdata["UserId"];
-                        echo "Hallo ",$_SESSION["user"],"!";
-                        # header("Location: index.php");
+                        header("Location: index.php");
                     } else {
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
