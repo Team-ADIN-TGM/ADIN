@@ -27,15 +27,40 @@ if(isset($_SESSION["user"])) {
 
         <tr>
         <td><input type="text" name="UserId2"></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
         <td><button type="submit" name="submitDelete">Delete</button></td>
         </tr>
     </form>
     <?php
-
     echo "</table>";
+    if(isset($_POST["submitInsert"])) {
+        $userid = $conn->real_escape_string($_POST["UserId"]);
+        $domainid = $conn->real_escape_string($_POST["DomainId"]);
+        $password = $conn->real_escape_string($_POST["password"]);
+        $email = $conn->real_escape_string($_POST["Email"]);
+
+        //Durchführen der SQL-Abfrage
+        $sql = "INSERT INTO Users_tbl (UserId, DomainId, password, Email) VALUES ('$userid', '$domainid', '$password', '$email')";
+        if(mysqli_query($conn, $sql)){
+            echo "Records inserted successfully.";
+            header("Location: users.php");
+        } else{
+            echo "ERROR: Could not able to execute";
+        }
+    }
+    if(isset($_POST["submitDelete"])) {
+        $userid2 = $conn->real_escape_string($_POST["UserId2"]);
+        $sql = "DELETE FROM Users_tbl WHERE UserId = $userid2" ;
+        if (mysqli_query($conn, $sql)) {
+            echo "Record deleted successfully";
+            header("Location: users.php");
+        } else {
+            echo "Error deleting record: " . mysqli_error($conn);
+        }
+    }
+
 
 
 }
