@@ -47,14 +47,11 @@
       ?>
 
       <form action='testtable.php' method='post'>
-      <table border=5>
-      <tr>
-      <td align='left'><input type="text" name="UserId"></td>
-      <td align='left'><input type="text" name="DomainId"></td>
-      <td align='left'><input type="text" name="password"></td>
-      <td align='left'><input type="text" name="Email"></td>
-      <button type="submit" name="submitInsert">
-      </tr>
+        <input type="text" name="UserId">
+        <input type="text" name="DomainId">
+        <input type="text" name="password">
+        <input type="text" name="Email">
+        <button type="submit" name="submitInsert">Insert</button>
       </form>
 
       <?php
