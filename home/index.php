@@ -34,7 +34,7 @@ if(isset($_POST["mailbox"])) {
     header("Location: mail.php");
 }
 if(isset($_POST["userconf"])) {
-    header("Location: user.php");
+    header("Location: ../testtable.php");
 }
 if(isset($_POST["groupconf"])) {
     header("Location: group.php");
