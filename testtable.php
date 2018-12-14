@@ -45,6 +45,7 @@
          echo "<td align='left'>" . $row['DomainName'] . "<br /><br />";
          echo "</tr>";
       }
+      echo "</table>";
       ?>
 
       <form action='testtable.php' method='post'>
