@@ -1,6 +1,7 @@
 <?php
-  include 'connect.php';
-   if(isset($_SESSION["user"])) {
+    session_start();
+    include 'connect.php';
+    if(isset($_SESSION["user"])) {
 
       echo "<b>Users_tbl</b><br />";
       $sql = "SELECT * FROM Users_tbl";
