@@ -16,7 +16,7 @@ if(isset($_SESSION["user"])) {
         echo "</tr>";
     }
     ?>
-    <form action='testtable.php' method='post'>
+    <form action='users.php' method='post'>
         <tr>
         <td><input type="text" name="UserId"></td>
         <td><input type="text" name="DomainId"></td>
