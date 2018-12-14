@@ -1,6 +1,6 @@
 <?php
   session_start();
-  include 'connect.php';
+  include '../config/connect.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,7 @@
         <meta charset="utf-8">
     </head>
     <body>
-        <form action="login.php" method="post">
+        <form action="index.php" method="post">
             <p>E-Mail:</p>
             <input type="text" name="username">
             <p>Passwort:</p>
@@ -29,7 +29,7 @@
                     if ($result_obj->num_rows > 0) {
                         
                         $_SESSION["user"] = $userdata["UserId"];
-                        header("Location: ./superuser/index.php");
+                        header("Location: ../home/index.php");
                     } else {
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>

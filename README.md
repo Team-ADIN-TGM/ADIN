@@ -2,6 +2,8 @@
 ## DB Connect
 $ git clone https://github.com/Team-ADIN-TGM/ADIN.git
 
+$ cd config
+
 $ vi connect.php
 
 ```
