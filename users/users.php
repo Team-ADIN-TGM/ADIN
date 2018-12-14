@@ -27,6 +27,9 @@ if(isset($_SESSION["user"])) {
 
         <tr>
         <td><input type="text" name="UserId2"></td>
+            <td></td>
+            <td></td>
+            <td></td>
         <td><button type="submit" name="submitDelete">Delete</button></td>
         </tr>
     </form>
