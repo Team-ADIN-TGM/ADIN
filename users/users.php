@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'connect.php';
+include '../connect.php';
 if(isset($_SESSION["user"])) {
 
     echo "<b>Users_tbl</b><br />";
@@ -17,15 +17,18 @@ if(isset($_SESSION["user"])) {
     }
     ?>
     <form action='testtable.php' method='post'>
+        <tr>
         <td><input type="text" name="UserId"></td>
         <td><input type="text" name="DomainId"></td>
         <td><input type="text" name="password"></td>
         <td><input type="text" name="Email"></td>
         <button type="submit" name="submitInsert">Insert</button>
-        <br>
+        </tr>
+
+        <tr>
         <input type="text" name="UserId2">
         <button type="submit" name="submitDelete">Delete</button>
-
+        </tr>
     </form>
     <?php
 
