@@ -22,12 +22,12 @@ if(isset($_SESSION["user"])) {
         <td><input type="text" name="DomainId"></td>
         <td><input type="text" name="password"></td>
         <td><input type="text" name="Email"></td>
-        <button type="submit" name="submitInsert">Insert</button>
+        <td><button type="submit" name="submitInsert">Insert</button></td>
         </tr>
 
         <tr>
-        <input type="text" name="UserId2">
-        <button type="submit" name="submitDelete">Delete</button>
+        <td><input type="text" name="UserId2"></td>
+        <td><button type="submit" name="submitDelete">Delete</button></td>
         </tr>
     </form>
     <?php
