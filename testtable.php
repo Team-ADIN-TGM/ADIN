@@ -54,6 +54,10 @@
         <input type="text" name="password">
         <input type="text" name="Email">
         <button type="submit" name="submitInsert">Insert</button>
+        <br>
+        <input type="text" name="UserId2">
+        <button type="submit" name="submitDelete">Delete</button>
+
       </form>
 
       <?php
@@ -70,8 +74,16 @@
          } else{
             echo "ERROR: Could not able to execute";
          }
-
       }
+        if(isset($_POST["submitDelete"])) {
+            $userid2 = $conn->real_escape_string($_POST["UserId2"]);
+            $sql = "DELETE FROM Users_tbl WHERE UserId = $userid2" ;
+            if (mysqli_query($conn, $sql)) {
+                echo "Record deleted successfully";
+            } else {
+                echo "Error deleting record: " . mysqli_error($conn);
+            }
+        }
 
    }
 ?>
