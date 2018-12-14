@@ -9,7 +9,7 @@
         <meta charset="utf-8">
     </head>
     <body>
-        <form action="index.php" method="post">
+        <form action="login.php" method="post">
             <p>E-Mail:</p>
             <input type="text" name="username">
             <p>Passwort:</p>
