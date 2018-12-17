@@ -60,7 +60,7 @@ if(isset($_SESSION["user"])) {
     }
     if(isset($_POST["submitDelete"])) {
         $userid2 = $conn->real_escape_string($_POST["UserId2"]);
-        $sql = "DELETE FROM Users_tbl WHERE UserId = $userid2" ;
+        $sql = "DELETE FROM Users_tbl WHERE UserId = '$userid2';";
         if (mysqli_query($conn, $sql)) {
             echo "Record deleted successfully";
             header("Location: users.php");
@@ -73,7 +73,7 @@ if(isset($_SESSION["user"])) {
         $domainid3 = $conn->real_escape_string($_POST["DomainId3"]);
         $password3 = $conn->real_escape_string($_POST["password3"]);
         $email3 = $conn->real_escape_string($_POST["Email3"]);
-        $sql = "UPDATE Users_tbl SET DomainId=$domainid3, password=$password3, Email= $email3 WHERE UserId = $userid3;";
+        $sql = "UPDATE Users_tbl SET UserId='$userid3', DomainId='$domainid3', password='$password3', Email='$email3' WHERE UserId = '$userid3';";
         if (mysqli_query($conn, $sql)) {
             echo "Record update successfully";
             header("Location: users.php");
