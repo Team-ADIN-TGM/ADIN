@@ -32,6 +32,14 @@ if(isset($_SESSION["user"])) {
         <td></td>
         <td><button type="submit" name="submitDelete">Delete</button></td>
         </tr>
+
+        <tr>
+        <td><input type="text" name="UserId3"></td></td>
+        <td><input type="text" name="DomainId3"></td>
+        <td><input type="text" name="password3"></td>
+        <td><input type="text" name="Email3"></td>
+        <td><button type="submit" name="submitUpdate">Update</button></td>
+        </tr>
     </form>
     <?php
     echo "</table>";
@@ -55,6 +63,19 @@ if(isset($_SESSION["user"])) {
         $sql = "DELETE FROM Users_tbl WHERE UserId = $userid2" ;
         if (mysqli_query($conn, $sql)) {
             echo "Record deleted successfully";
+            header("Location: users.php");
+        } else {
+            echo "Error deleting record: " . mysqli_error($conn);
+        }
+    }
+    if(isset($_POST["submitUpdate"])) {
+        $userid3 = $conn->real_escape_string($_POST["UserId3"]);
+        $domainid3 = $conn->real_escape_string($_POST["DomainId3"]);
+        $password3 = $conn->real_escape_string($_POST["password3"]);
+        $email3 = $conn->real_escape_string($_POST["Email3"]);
+        $sql = "UPDATE Users_tbl SET DomainId=$domainid3, password=$password3, Email= $email3 WHERE UserId = $userid3;";
+        if (mysqli_query($conn, $sql)) {
+            echo "Record update successfully";
             header("Location: users.php");
         } else {
             echo "Error deleting record: " . mysqli_error($conn);
