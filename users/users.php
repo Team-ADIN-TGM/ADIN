@@ -65,7 +65,7 @@ if(isset($_SESSION["user"])) {
             echo "Record deleted successfully";
             header("Location: users.php");
         } else {
-            echo "Error deleting record: " . mysqli_error($conn);
+            echo "Error deleting record";
         }
     }
     if(isset($_POST["submitUpdate"])) {
@@ -78,7 +78,7 @@ if(isset($_SESSION["user"])) {
             echo "Record update successfully";
             header("Location: users.php");
         } else {
-            echo "Error deleting record: " . mysqli_error($conn);
+            echo "Error deleting record";
         }
     }
 
