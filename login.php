@@ -34,7 +34,8 @@
                         ?>
                         <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
                         <?php
-                            echo("SQL Query".$sql);
+                            session_destroy();
+                            echo("SQL Query: ".$sql);
                             var_dump($userdata);
                     }
                 }
