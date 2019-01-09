@@ -25,3 +25,28 @@
 .space {
     letter-spacing: 10px;
 }
+
+.center {
+    margin-top: 10%;
+    text-align: center;
+}
+
+.loginbtn
+{
+    margin-left: 19%;
+    margin-top: 1%;
+}
+
+.logininput
+{
+    width:25%;
+    
+}
+
+.logintext{
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;    
+    font-size: 20px;
+    margin-top: 2%;
+}
