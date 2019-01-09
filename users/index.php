@@ -1,3 +1,10 @@
+<html>
+<head>
+    <script type="text/javascript" src=".,/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="../DataTables/jQuery-3.3.1/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
 <?php
 session_start();
 include '../connect.php';
@@ -16,7 +23,7 @@ if(isset($_SESSION["user"])) {
         echo "</tr>";
     }
     ?>
-    <form action='users.php' method='post'>
+    <form action='index.php' method='post'>
         <tr>
         <td><input type="text" name="UserId"></td>
         <td><input type="text" name="DomainId"></td>
@@ -86,3 +93,6 @@ if(isset($_SESSION["user"])) {
 
 }
 ?>
+</body>
+</html>
+

@@ -6,11 +6,12 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
         <title>ADIN - Login</title>
         <meta charset="utf-8">
     </head>
     <body>
-        <form action="login.php" method="post">
+        <form action="index.php" method="post">
             <p>E-Mail:</p>
             <input type="text" name="username">
             <p>Passwort:</p>

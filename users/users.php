@@ -1,3 +1,10 @@
+<html>
+<head>
+    <script type="text/javascript" src=".,/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="../DataTables/jQuery-3.3.1/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
 <?php
 session_start();
 include '../connect.php';
@@ -16,29 +23,31 @@ if(isset($_SESSION["user"])) {
         echo "</tr>";
     }
     ?>
+
+
     <form action='users.php' method='post'>
         <tr>
-        <td><input type="text" name="UserId"></td>
-        <td><input type="text" name="DomainId"></td>
-        <td><input type="text" name="password"></td>
-        <td><input type="text" name="Email"></td>
-        <td><button type="submit" name="submitInsert">Insert</button></td>
+            <td><input type="text" name="UserId"></td>
+            <td><input type="text" name="DomainId"></td>
+            <td><input type="text" name="password"></td>
+            <td><input type="text" name="Email"></td>
+            <td><button type="submit" name="submitInsert">Insert</button></td>
         </tr>
 
         <tr>
-        <td><input type="text" name="UserId2"></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td><button type="submit" name="submitDelete">Delete</button></td>
+            <td><input type="text" name="UserId2"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button type="submit" name="submitDelete">Delete</button></td>
         </tr>
 
         <tr>
-        <td><input type="text" name="UserId3"></td></td>
-        <td><input type="text" name="DomainId3"></td>
-        <td><input type="text" name="password3"></td>
-        <td><input type="text" name="Email3"></td>
-        <td><button type="submit" name="submitUpdate">Update</button></td>
+            <td><input type="text" name="UserId3"></td></td>
+            <td><input type="text" name="DomainId3"></td>
+            <td><input type="text" name="password3"></td>
+            <td><input type="text" name="Email3"></td>
+            <td><button type="submit" name="submitUpdate">Update</button></td>
         </tr>
     </form>
     <?php
@@ -86,3 +95,5 @@ if(isset($_SESSION["user"])) {
 
 }
 ?>
+</body>
+</html>
