@@ -17,9 +17,9 @@ include '../connect.php';
                 <div class="form-group">
                     <img src="../img/logo.png" class="img" >
                     <p class="logintext">E-Mail:</p>
-                        <input type="email" class="form-control logininput mx-auto" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                        <input type="email" class="form-control logininput mx-auto" name="username" aria-describedby="emailHelp" placeholder="Enter email">
                     <p class="logintext">Passwort:</p>
-                    <input type="password" class="form-control logininput mx-auto" id="exampleInputPassword1" placeholder="Password">
+                    <input type="password" class="form-control logininput mx-auto" name="password" placeholder="Password">
                     <?php
                     if (isset($_POST["submitLogin"])) {
                         $username = $conn->real_escape_string($_POST["username"]);
