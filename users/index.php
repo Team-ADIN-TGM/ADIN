@@ -34,7 +34,7 @@ if(isset($_SESSION["user"])) {
         </tr>
 
         <tr>
-        <td><input type="text" name="UserId3"></td></td>
+        <td><input type="text" name="UserId3"></td>
         <td><input type="text" name="DomainId3"></td>
         <td><input type="text" name="password3"></td>
         <td><input type="text" name="Email3"></td>
