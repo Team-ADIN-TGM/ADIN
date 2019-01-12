@@ -26,7 +26,7 @@
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-            <a href="../users/users.php" class="a">
+            <a href="../users/index.php" class="a">
                 <div class="item">
                     <img src="../img/benutzer.png" class="img">
                     <span>Benutzer</span>
