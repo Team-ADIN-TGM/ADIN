@@ -63,30 +63,46 @@
 	<!-- Haupt-Container -->
 	<div class="container-fluid">
 		
-		<h1 class="mt-3">Benutzer</h1>
+		<h1 class="mt-3">Mailboxen</h1>
+		
+		<!-- Zur Auswahl der Domain, deren Mailboxen angezeigt werden sollen -->
+		<!-- TODO: Links, es dürfen nur die Domains angezeigt werden für die der Benutzer Rechte
+		hat (bei Delegated Admins) -->
+		<div class="dropdown">
+			<button class="btn adin-button dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Domain auswählen
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item" href="?domain=flashbrother.net">flashbrother.net</a>
+				<a class="dropdown-item" href="?domain=flashbrother.net">test.dns.or.at</a>
+			</div>
+		</div>
 		
 		<!-- Übersichtstabelle -->
 		<table class="overview-table">
 			<tr>
-				<th class="overview-table-content-cell">Voller Name</th>
+				<th class="overview-table-content-cell">Benutzer-ID</th>
 				<th class="overview-table-content-cell">Benutzername</th>
+				<th class="overview-table-content-cell">Voller Name</th>
 				<th class="overview-table-content-cell">Email-Adresse</th>
+				<th class="overview-table-content-cell">Domain</th>
 				<th class="overview-table-content-cell">Passwort</th>
-				<th class="overview-table-content-cell">Benutzer-Typ</th>
-				<th class="overview-table-content-cell">Berechtigt für Domains</th>
+				<th class="overview-table-content-cell">Weiterleiten an</th>
+				<th class="overview-table-content-cell">Kopie an</th>
+				<th class="overview-table-content-cell">Notiz</th>
 				<th class="overview-table-button-cell"></th>
 				<th class="overview-table-button-cell"></th>
 			</tr>
 			<tr>
-				<td class="overview-table-content-cell">Markus Frank</td>
+				<td class="overview-table-content-cell">35</td>
 				<td class="overview-table-content-cell">mfrank</td>
+				<td class="overview-table-content-cell">Markus Frank</td>
 				<td class="overview-table-content-cell">mfrank@flashbrother.net</td>
+				<td class="overview-table-content-cell">flashbrother.net</td>
 				<td class="overview-table-content-cell">************</td>
-				<td class="overview-table-content-cell">Delegated Admin</td>
-				<td class="overview-table-content-cell">
-					flashbrother.net<br>
-					test.dns.or.at<br>
-				</td>
+				<td class="overview-table-content-cell">mfrank@student.tgm.ac.at</td>
+				<td class="overview-table-content-cell">mfrank@aon.at</td>
+				<td class="overview-table-content-cell">Nur zu Testzwecken</td>
 				<!-- TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
 				<td class="overview-table-button-cell">
 					<a href="update.html" target="_blank">
@@ -103,7 +119,7 @@
 		
 		<a href="new.html" class="btn mt-5 adin-button overview-table-add-button">
 			<img src="../img/add.png" class="mr-3">
-			Neuen Benutzer hinzufügen
+			Neue Mailbox hinzufügen
 		</a>
 	</div>
 </body>

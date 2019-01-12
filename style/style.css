@@ -1,27 +1,105 @@
-.item{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/*********************************************
+ *                ALLGEMEIN                  *
+ *********************************************/
 
-.adin{
+/* Zum Setzen der Farbe */
+.adin {
     background-color: #36747e;
 }
 
-.a {
-    color:white;
-    text-decoration: none;
+
+/*********************************************
+ *                  NAVBAR                   *
+ *********************************************/
+
+#adin-navbar-logo {
+	height: 50px;
 }
 
-.a:hover {
-    color:white;
-    text-decoration: none;
+.adin-navbar-item {
+	text-align: center;
+	display: inline-block;
+	padding: 5px;
+	margin: 0px;
+	width: 100px;
+}
+.adin-navbar-item:hover {
+	background-color: #4f858e;
 }
 
-.img {
-    box-sizing: border-box;
-    height: 80px;
+.adin-navbar-link {
+	color: white;
+	text-decoration: none;
+	text-align: center;
+	display: inline-block;
 }
-.space {
-    letter-spacing: 10px;
+.adin-navbar-link:hover,
+.adin-navbar-link:focus {
+	background-color: #4f858e;
+	color: white;
+	text-decoration: none;
+}
+
+.adin-navbar-item-img {
+	height: 50px;
+	display: block;
+}
+
+.adin-navbar-item-text {
+	margin: 0px;
+}
+
+
+/*********************************************
+ *             ÜBERSICHTSTABELLEN            *
+ *********************************************/
+
+.overview-table {
+	margin: 30px 0px 0px 0px;
+	width: 100%;
+	padding: 0px;
+}
+
+.overview-table th,
+.overview-table td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin: 0px;
+	padding: 10px;
+}
+
+.overview-table th {
+	background-color: #4f858e;
+	color: white;
+}
+
+.overview-table-button-cell {
+	width: 60px;
+	max-width: 60px;
+	text-align: center
+}
+
+.overview-table-delete-button,
+.overview-table-edit-button {
+	width: 40px;
+}
+
+.overview-table-add-button {
+	vertical-align: middle;
+}
+
+
+/*********************************************
+ *                  FORMULARE                *
+ *********************************************/
+
+.adin-button {
+	background-color: #36747e;
+	color: white;
+}
+
+.input-group-text-midinput {
+	border-radius: 0px !important; 
+	border-left: none !important;
+	border-right: none !important;
 }

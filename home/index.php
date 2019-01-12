@@ -15,11 +15,11 @@
    
     if(isset($_SESSION["user"])) {
 ?>
-<nav class="adin navbar">
+<nav class="navbar adin">
     <ul class="navbar-nav">
         <li class="nav-item">
-                <div class="item">
-                    <img src="../img/logo.png" class="img">
+                <div class="adin-navbar-item">
+                    <img src="../img/logo.png" class="adin-navbar-img">
                 </div>
         </li>
     </ul>
