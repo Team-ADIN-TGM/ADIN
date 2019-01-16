@@ -15,7 +15,7 @@ include '../connect.php';
             
             <form action="index.php" method="post">
                 <div class="form-group">
-                    <img src="../img/logo.png" class="img" >
+                    <img src="../img/logo.png" id="adin-login-logo">
                     <p class="logintext">E-Mail:</p>
                         <input type="email" class="form-control logininput mx-auto" name="username" aria-describedby="emailHelp" placeholder="Enter email">
                     <p class="logintext">Passwort:</p>

@@ -109,6 +109,11 @@
     text-align: center;
 }
 
+#adin-login-logo {
+	width: 40%;
+	min-width: 200px;
+}
+
 .loginbtn
 {
     margin-left: 19%;
