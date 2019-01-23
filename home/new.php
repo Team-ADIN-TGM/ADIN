@@ -1,6 +1,15 @@
+<!--
+TODO:
+- Dropdown für Domains mit Domains füllen, für die der Benutzer Rechte hat
+-->
+<?php 
+	session_start(); 
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-	<title>ADIN - Benutzer hinzufügen</title>
+	<title>ADIN - Mailbox hinzufügen</title>
 	<meta charset="utf-8">
 	
 	<!-- Stylesheets -->
@@ -11,14 +20,14 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	
-	
+
 </head>
 	
 <body>
+	<?php if (isset($_SESSION["user"])): ?>
 	<div class="container-fluid mt-3">
-		<h3>Neuen Benutzer hinzufügen</h3>
-
+		<h3>Neue Mailbox hinzufügen</h3>
+		
 		<form method="POST" action="index.php">
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
@@ -27,11 +36,25 @@
 				<input type="text" class="form-control" name="username">
 			</div>
 			
+			<!-- TODO: Dropdown muss mit den existierenden Domains gefüllt werden, für die der Benutzer Rechte hat -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">E-Mail-Adresse</span>
 				</div>
 				<input type="text" class="form-control" name="email">
+				<span class="input-group-text input-group-text-midinput">@</span>
+				<select class="custom-select" name="usertype">
+					<option value="1">test.dns.or.at</option>
+					<option value="2">test1.dns.or.at</option>
+				</select>
+			</div>
+			
+			<div class="input-group mb-3 col-lg-6">
+				<div class="input-group-prepend">
+					<span class="input-group-text"> Voller Name</span>
+				</div>
+				<input type="text" class="form-control" name="firstname" placeholder="Vorname">
+				<input type="text" class="form-control" name="lastname" placeholder="Nachname">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
@@ -50,17 +73,35 @@
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Benutzertyp</span>
+					<span class="input-group-text">Weiterleiten an</span>
 				</div>
-				<select class="custom-select" name="usertype">
-					<option value="delegated-admin">Delegated Admin</option>
-					<option value="superuser">Superuser</option>
-				</select>
+				<input type="text" class="form-control" name="redirect" placeholder="Leer lassen, um Mails nicht weiterzuleiten">
 			</div>
 			
-			<input type="submit" class="btn adin-button" name="insert" value="Benutzer hinzufügen">
-			<a class="btn btn-danger" href="../users/">Abbrechen</a>
+			<div class="input-group mb-3 col-lg-6">
+				<div class="input-group-prepend">
+					<span class="input-group-text">Kopie an</span>
+				</div>
+				<input type="text" class="form-control" name="copy" placeholder="Leer lassen, um keine Kopien zu senden">
+			</div>
+			
+			<div class="input-group mb-3 col-lg-6">
+				<div class="input-group-prepend">
+					<span class="input-group-text">Notiz</span>
+				</div>
+				<input type="text" class="form-control" name="note">
+			</div>
+			
+			<input type="submit" class="btn adin-button" name="insert" value="Mailbox hinzufügen">
+			<a class="btn btn-danger" href="../home/">Abbrechen</a>
 		</form>
 	</div>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>
 </body>
 </html>

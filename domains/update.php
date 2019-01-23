@@ -1,3 +1,14 @@
+<!--
+TODO:
+- Überprüfen, ob der Benutzer die notwendigen Rechte hat, um die Mailbox zu bearbeiten
+- Daten aus der Datenbank auslesen und alle Eingabefelder ausfüllen (außer die Passwörter)
+- Das Domain-Dropdown mit Domains füllen, für die der Benutzer die Rechte hat
+-->
+<?php 
+	session_start(); 
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 	<title>ADIN - Domain ändern</title>
@@ -15,6 +26,7 @@
 </head>
 	
 <body>
+	<?php /* if(benutzer hat rechte): */ ?>
 	<div class="container-fluid mt-3">
 		<h3>Domain ändern</h3>
 		
@@ -42,5 +54,17 @@
 			<a class="btn btn-danger" href="../domains/">Änderungen verwerfen</a>
 		</form>
 	</div>
+	
+	<?php elseif (isset($_SESSION["user"])): ?>
+	
+	<!-- Benutzer angemeldet, aber nicht berechtigt -->
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>
+	
 </body>
 </html>

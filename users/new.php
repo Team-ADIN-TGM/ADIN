@@ -1,6 +1,15 @@
+<!--
+TODO:
+- Dropdown für Domains mit Domains füllen, für die der Benutzer Rechte hat
+-->
+<?php 
+	session_start(); 
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-	<title>ADIN - Benutzer ändern</title>
+	<title>ADIN - Benutzer hinzufügen</title>
 	<meta charset="utf-8">
 	
 	<!-- Stylesheets -->
@@ -12,59 +21,62 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 	
-	
 </head>
 	
 <body>
+	<?php if (isset($_SESSION["user"])): ?>
 	<div class="container-fluid mt-3">
-		<h3>Benutzerdaten ändern</h3>
-		
-		<!-- TODO: Die einzelnen Eingabefelder müssen in PHP (mittels value-Attribut) ausgefüllt werden
-			 Ausnahme: Die Passwort-Eingabefelder werden nicht ausgefüllt! -->
+		<h3>Neuen Benutzer hinzufügen</h3>
+
 		<form method="POST" action="index.php">
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">Benutzername</span>
 				</div>
-				<input type="text" class="form-control" name="username" value="mfrank">
+				<input type="text" class="form-control" name="username">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">E-Mail-Adresse</span>
 				</div>
-				<input type="text" class="form-control" name="email" value="mfrank@flashbrother.net">
+				<input type="text" class="form-control" name="email">
 			</div>
 			
-			<!-- TODO: Die Passwort-Felder müssen geprüft werden. Sie müssen beide ausgefüllt und gleich sein -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">Passwort</span>
 				</div>
-				<input type="password" class="form-control" name="password" placeholder="Zum Ändern neues Passwort eingeben">
+				<input type="password" class="form-control" name="password">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">Passwort wiederholen</span>
 				</div>
-				<input type="password" class="form-control" name="password-repeat" placeholder="Zum Ändern neues Passwort wiederholen">
+				<input type="password" class="form-control" name="password-repeat">
 			</div>
 			
-			<!-- TODO: Hier muss "selected" bei der richtigen <option> gesetzt werden -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
 					<span class="input-group-text">Benutzertyp</span>
 				</div>
 				<select class="custom-select" name="usertype">
-					<option value="delegated-admin" selected>Delegated Admin</option>
+					<option value="delegated-admin">Delegated Admin</option>
 					<option value="superuser">Superuser</option>
 				</select>
 			</div>
 			
-			<input type="submit" class="btn adin-button" name="update" value="Änderungen speichern">
-			<a class="btn btn-danger" href="../users/">Änderungen verwerfen</a>
+			<input type="submit" class="btn adin-button" name="insert" value="Benutzer hinzufügen">
+			<a class="btn btn-danger" href="../users/">Abbrechen</a>
 		</form>
 	</div>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>
 </body>
 </html>

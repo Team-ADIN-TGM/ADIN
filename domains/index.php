@@ -1,3 +1,15 @@
+<!--
+TODO:
+- Dynamisches Auslesen der Datenbank und füllen der Tabelle
+- Setzen der Links zu delete/new/update-Seiten
+- Reagieren auf Aktionen in den delete/new/update-Seiten
+-->
+
+<?php
+	session_start();
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 	<title>ADIN - Benutzer</title>
@@ -13,7 +25,7 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </head>
 <body>
-	
+	<?php if (isset($_SESSION["user"])): ?>
 	<!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
@@ -87,5 +99,12 @@
 			Neue Domain hinzufügen
 		</a>
 	</div>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>	
 </body>
 </html>

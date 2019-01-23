@@ -1,11 +1,23 @@
+<!--
+TODO:
+- Dynamisches Auslesen der Datenbank und füllen der Tabelle
+- Setzen der Links zu delete/new/update-Seiten
+- Reagieren auf Aktionen in den delete/new/update-Seiten
+-->
+
 <?php
- session_start();
- include '../connect.php';
+	session_start();
+	include '../connect.php';
+
+	/*
+	 * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
+	 * Reagieren darauf, auslesen der Parameter, Zugriff auf die Datenbank
+	 */
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-	<title>ADIN - Home</title>
+	<title>ADIN - Benutzer</title>
 	<meta charset="utf-8">
 	
 	<!-- Stylesheets -->
@@ -16,12 +28,10 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 </head>
 <body>
-<?php
-   
-    if(isset($_SESSION["user"])) {
-?>
+	<?php if (isset($_SESSION["user"])): ?>
 	<!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
@@ -74,7 +84,11 @@
 			</div>
 		</div>
 		
-		<!-- Übersichtstabelle -->
+		<!-- Übersichtstabelle 
+			TODO: Aus der Datenbank auslesen
+			- Die Domain wird entweder als GET-Parameter übergeben, oder es wird einfach die erste aus der Datenbank genommen
+			- Es muss trotzdem noch geprüft werden, ob der Benutzer Zugriffsrechte hat, damit er nicht irgendwelche Domains abfragen kann
+		-->
 		<table class="overview-table">
 			<tr>
 				<th class="overview-table-content-cell">Benutzer-ID</th>
@@ -99,7 +113,7 @@
 				<td class="overview-table-content-cell">mfrank@student.tgm.ac.at</td>
 				<td class="overview-table-content-cell">mfrank@aon.at</td>
 				<td class="overview-table-content-cell">Nur zu Testzwecken</td>
-				<!-- TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
+				<!-- TODO: Links müssen die ID der Mailbox enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
 				<td class="overview-table-button-cell">
 					<a href="update.html" target="_blank">
 						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
@@ -118,13 +132,12 @@
 			Neue Mailbox hinzufügen
 		</a>
 	</div>
-<?php
-    } else {
-?>
-        <p>Sie sind nicht angemeldet!</p>
-        <a href="../login/login.php">Login</a>
-<?php
-    }
-?>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>
 </body>
 </html>

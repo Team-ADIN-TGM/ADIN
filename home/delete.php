@@ -1,3 +1,15 @@
+<!--
+TODO:
+- ID aus der URL auslesen
+- Überprüfen, ob der Benutzer die Rechte hat, um darauf zuzugreifen
+- Text mit Daten ausfüllen (wie ID, Email-Adresse)
+-->
+
+<?php
+	session_start();
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 	<title>ADIN - Mailbox löschen</title>
@@ -16,6 +28,10 @@
 </head>
 	
 <body>
+	<?php
+		//TODO: Überprüfen, ob der Benutzer die Rechte hat
+		//if (rechte):
+	?>
 	<div class="container-fluid mt-3">
 		<h3 class="mb-3">Mailbox löschen</h3>
 		
@@ -33,5 +49,13 @@
 			<a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
 		</div>
 	</div>
+	
+	<?php else:	?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+	<a href="../login/">Login</a>
+	
+	<?php endif; ?>
+	
 </body>
 </html>

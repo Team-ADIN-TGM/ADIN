@@ -6,7 +6,7 @@ $ cd config
 
 $ vi connect.php
 
-```
+```php
 <?php
     $dbhost = "localhost";
     $dbusername = "username";

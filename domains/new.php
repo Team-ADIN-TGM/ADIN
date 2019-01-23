@@ -1,3 +1,12 @@
+<!--
+TODO:
+- Dropdown für Domains mit Domains füllen, für die der Benutzer Rechte hat
+-->
+<?php 
+	session_start(); 
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 	<title>ADIN - Domain hinzufügen</title>
@@ -15,6 +24,7 @@
 </head>
 	
 <body>
+	<?php if (isset($_SESSION["user"])): ?>
 	<div class="container-fluid mt-3">
 		<h3>Neue Domain hinzufügen</h3>
 		
@@ -41,5 +51,12 @@
 			<a class="btn btn-danger" href="../domains/">Abbrechen</a>
 		</form>
 	</div>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+    <a href="../login/">Login</a>
+	
+	<?php endif; ?>
 </body>
 </html>

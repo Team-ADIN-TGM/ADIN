@@ -97,6 +97,10 @@
 	background-color: #36747e;
 	color: white;
 }
+.adin-button:hover {
+	background-color: #4f858e;
+	color: white;
+}
 
 .input-group-text-midinput {
 	border-radius: 0px !important; 

@@ -1,6 +1,18 @@
+<!--
+TODO:
+- ID aus der URL auslesen
+- Überprüfen, ob der Benutzer die Rechte hat, um darauf zuzugreifen
+- Text mit Daten ausfüllen (wie ID, Email-Adresse)
+-->
+
+<?php
+	session_start();
+	include "../connect.php";
+?>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-	<title>ADIN - Domain löschen</title>
+	<title>ADIN - Benutzer löschen</title>
 	<meta charset="utf-8">
 	
 	<!-- Stylesheets -->
@@ -16,23 +28,32 @@
 </head>
 	
 <body>
+	<?php if (isset($_SESSION["user"])): ?>
 	<div class="container-fluid mt-3">
-		<h3 class="mb-3">Domain löschen</h3>
+		<h3 class="mb-3">Benutzer löschen</h3>
 		
-		<!-- TODO: Die Nachricht muss angepasst werden -->
+		<!-- TODO: Meldung anpassen -->
 		<span class="mb-3">
-			Sind Sie sicher, dass Sie die Domain flashbrother.net löschen wollen?<br>
-			Wenn Sie die Domain löschen, werden auch alle zugehörigen Mailboxen und Verteiler gelöscht.
+			Sind Sie sicher, dass sie den Benutzer mfrank löschen wollen?<br>
+			Dieser Benutzer ist ein Delegated Admin. Wenn Sie ihn löschen, haben die folgenden Domains keinen Delegated Admin mehr:<br>
+			<!-- TODO: Liste der Domains -->
 		</span>
 		
 		<!-- TODO: Links müssen logischerweise noch angepasst werden -->
 		<div class="mt-3">
 			<form method="post" action="index.php" style="display: inline;">
-				<input type="hidden" name="domainid" value="1"><!-- TODO: Wert ist immer die ID der zu löschenden Domain -->
+				<input type="hidden" name="username" value="">
 				<input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
 			</form>
 			<a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
 		</div>
 	</div>
+	
+	<?php else: ?>
+	
+	<p>Sie sind nicht angemeldet!</p>
+	<a href="../login/">Login</a>
+	
+	<?php endif; ?>
 </body>
 </html>
