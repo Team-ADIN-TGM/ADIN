@@ -45,23 +45,29 @@ TODO:
 				</a>
 			</div>
 			<div class="navbar-item adin-navbar-item">
-				<a class="adin-navbar-link" href="../users/">
+				<a class="adin-navbar-link" href="../home/">
 					<img class="adin-navbar-item-img" src="../img/mail.png">
 					<p class="adin-navbar-item-text">Mailboxen</p>
 				</a>
 			</div>
 			<div class="navbar-item adin-navbar-item">
-				<a class="adin-navbar-link" href="../users/">
+				<a class="adin-navbar-link" href="../groups/">
 					<img class="adin-navbar-item-img" src="../img/personen.png">
 					<p class="adin-navbar-item-text">Verteiler</p>
 				</a>
 			</div>
 			<div class="navbar-item adin-navbar-item">
-				<a class="adin-navbar-link" href="../users/">
+				<a class="adin-navbar-link" href="../domains/">
 					<img class="adin-navbar-item-img" src="../img/at.png">
 					<p class="adin-navbar-item-text">Domains</p>
 				</a>
 			</div>
+            <div class="navbar-item adin-navbar-item">
+                <a class="adin-navbar-link" href="../login/logout.php">
+                    <img class="adin-navbar-item-img" src="../img/logout.png">
+                    <p class="adin-navbar-item-text">Logout</p>
+                </a>
+            </div>
 		</div>
 	</nav>
 	
@@ -94,19 +100,19 @@ TODO:
 				</td>
 				<!-- TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
 				<td class="overview-table-button-cell">
-					<a href="update.html" target="_blank">
+					<a href="update.php" target="_blank">
 						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
 					</a>
 				</td>
 				<td class="overview-table-button-cell">
-					<a href="delete.html" target="_blank">
+					<a href="delete.php" target="_blank">
 						<img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
 					</a>
 				</td>
 			</tr>
 		</table>
 		
-		<a href="new.html" class="btn mt-5 adin-button overview-table-add-button">
+		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
 			<img src="../img/add.png" class="mr-3">
 			Neuen Benutzer hinzufügen
 		</a>
