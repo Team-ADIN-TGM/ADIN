@@ -80,7 +80,9 @@ if ($user_logged_in) {
 
     if ($user_has_rights) {
         if ($noerror) {
-            //Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
+            /*
+             * * Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
+             */
             ?>
 
             <div class="container-fluid mt-3">
