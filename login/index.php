@@ -1,5 +1,4 @@
 <?php
-session_start();
 include '../connect.php';
 ?>
 <!DOCTYPE html>
@@ -16,34 +15,50 @@ include '../connect.php';
             <form action="index.php" method="post">
                 <div class="form-group">
                     <img src="../img/logo.png" id="adin-login-logo">
-                    <p class="logintext">E-Mail:</p>
-                        <input type="email" class="form-control logininput mx-auto" name="username" aria-describedby="emailHelp" placeholder="Enter email">
+                    <p class="logintext">Benutzername</p>
+                        <input type="text" class="form-control logininput mx-auto" name="username" placeholder="Benutzername">
                     <p class="logintext">Passwort:</p>
-                    <input type="password" class="form-control logininput mx-auto" name="password" placeholder="Password">
+                    <input type="password" class="form-control logininput mx-auto" name="password" placeholder="Passwort">
+
                     <?php
-                    if (isset($_POST["submitLogin"])) {
-                        $username = $conn->real_escape_string($_POST["username"]);
-                        $password = $conn->real_escape_string($_POST["password"]);
+                        if (isset($_POST["submitLogin"])) {
+                            $username = $conn->real_escape_string($_POST["username"]);
+                            $password = $conn->real_escape_string($_POST["password"]);
 
                             //Durchführen der SQL-Abfrage
-                        $sql = "SELECT * FROM Users_tbl WHERE Email='$username' AND password='$password';";
-                        $result_obj = $conn->query($sql);
-                        $userdata = $result_obj->fetch_assoc();
+                            $sql = "SELECT * FROM Admins_tbl WHERE Username = ? AND Password = ?;";
+                            $prep_stmt = $conn->prepare($sql);
+                            $prep_stmt->bind_param("ss", $username, $password);
 
-                            //Überprüfen ob der Login richtig ist
-                        if ($result_obj->num_rows > 0) {
+                            //TODO: Entfernen, nur zum Debuggen
+                            echo "SELECT * FROM Admins_tbl WHERE Username = '$username' AND Password = '$password';";
 
-                            $_SESSION["user"] = $userdata["UserId"];
-                            header("Location: ../home/index.php");
-                        } else {
-                            ?>
+                            $prep_stmt->execute();
+                            $res = $prep_stmt->get_result();
+
+                            //Überprüfen ob der Login richtig ist - dann müsste eine Zeile zurückgegeben werden
+                            if ($res->num_rows == 1) {
+                                $userdata = $res->fetch_assoc();
+                                session_start();
+                                $_SESSION["user"] = $userdata["Username"];
+                                $_SESSION["userid"] = $userdata["AdminId"];
+                                header("Location: ../home/index.php");
+                            } elseif ($res->num_rows == 0) {
+                                //Es gibt keine Übereinstimmung, Benutzername oder Passwort falsch
+                                ?>
                                 <p style="color:red;">Benutzername oder Passwort inkorrekt</p>
                                 <?php
 
+                            } elseif ($res->num_rows > 1) {
+                                //Fehler in der Abfrage! -> Sicherheitshalber nicht einloggen
+                                ?>
+                                <p style="color:red;">
+                                    Fehler bei der Überprüfung der Login-Daten - Bitte Kontaktieren Sie den Webmaster!
+                                </p>
+                                <?php
                             }
                         }
-                        ?>
-
+                    ?>
 
                     <p><button class="btn btn-light loginbtn" type="submit" name="submitLogin">Login</button></p>
                 </div>

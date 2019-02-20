@@ -1,15 +1,17 @@
 <!--
 TODO:
-- Fehlersuche (Zeile 42 - 65)
 - Konzept überlegen, wie man mit den PHP-Funktionen, die entweder TRUE oder FALSE returnen, Error-Handling machen kann
-- ID aus der URL auslesen
-- Überprüfen, ob der Benutzer die Rechte hat, um darauf zuzugreifen
-- Text mit Daten ausfüllen (wie ID, Email-Adresse)
 -->
 
 <?php
 session_start();
 include "../connect.php";
+
+//Turn on error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -30,70 +32,117 @@ include "../connect.php";
 </head>
 
 <body>
+
 <?php
-$user_logged_in = isset($_SESSION["user"]);
-$logged_in_username = 3; //TODO: Change to user ID from Session Variable
 
-$user_has_rights = false;
-$noerror = true;
-$domain_id = intval($_GET["id"]);
-$domain_name = "";
+//SCHRITT 1: ÜBERPRÜFEN, OB BENUTZER EINGELOGGT IST
+$user_logged_in = isset($_SESSION["user"]); //true wenn Benutzer eingeloggt
 
-//Überprüfen, ob der Benutzer die Rechte hat, die Domain zu löschen
-$sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
-INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
-INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-WHERE Admins_tbl.UserName = ?";
+if ($user_logged_in) {
+    //Jetzt werden die Rechte geprüft
 
-//Erstellen eines Prepared Statements
-if ($prep_stmt = $conn->prepare($sql)) {
+    $logged_in_user = $_SESSION["userid"];
+    $user_has_rights = false; //Wird auf true gesetzt, wenn der Benutzer die Rechte hat, um die Domain zu löschen
+    $noerror = true; //Wird auf false gesetzt, wenn ein Fehler aufgetreten ist
+    $domain_id = intval($_GET["id"]); //Die ID der zu löschenden Domain, übergeben per URL (delete.php?id=3)
+    //$domain_name = "";
 
-    $prep_stmt->bind_param("i", $logged_in_usernameg);
+    /*
+     * SQL-Statement zum Überprüfen, ob der Benutzer die Rechte hat, die Domain zu löschen
+     * Gibt die Domain-ID und den Domain-Namen aller Domains zurück, die den übergebenen Admin als Domain-Admin haben.
+     * Jede Domain kann nur einen Domain-Admin haben
+     */
+    $sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
+    INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+    INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
+    WHERE Admins_tbl.AdminId = ?";
+
+    //Erstellen eines PreparedStatements und setzen des Parameters
+    $prep_stmt = $conn->prepare($sql);
+    $prep_stmt->bind_param("i", $logged_in_user);
+
+    //Ausführen und laden des Ergebnisses
     $prep_stmt->execute();
-    $prep_stmt->get_result();
+    $res = $prep_stmt->get_result();
 
-    //Prüfen, ob die zu löschende Domain in der Menge der Domains enthalten ist, für die der Benutzer Rechte hat
+    /*
+     * Jetzt wird das Ergebnis mit einer Schleife durchlaufen. Wenn eine enthaltene Domain-ID zu der in der URL über-
+     * gebenen Domain-ID passt, bedeutet das, dass der Benutzer die Rechte hat, um die Domain zu löschen.
+     */
     while ($row = $res->fetch_assoc()) {
         if ($row["DomainId"] == $domain_id) {
+            //Domain wurde gefunden - Benutzer hat Rechte
             $user_has_rights = true;
             $domain_name = $row["DomainName"];
+            break;
         }
     }
 
-    echo "Check for rights finished - result: ".(($user_has_rights) ? "true" : "false");
-} else {
-    echo "meeeeh";
-}
+    if ($user_has_rights) {
+        if ($noerror) {
+            //Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
+            ?>
 
-//Wenn der Benutzer angemeldet ist, die Rechte hat und kein Fehler aufgetreten ist
-if ($user_logged_in && $user_has_rights && $noerror) {
+            <div class="container-fluid mt-3">
+                <h3 class="mb-3">Domain löschen</h3>
+
+                <span class="mb-3">
+                Sind Sie sicher, dass Sie die Domain <?php echo $domain_name ?> mit der ID <?php echo $domain_id ?>
+                    löschen wollen?<br>
+                <b>ACHTUNG</b> - Wenn Sie die Domain löschen, werden auch alle zugehörigen Mailboxen und Verteiler gelöscht.
+                </span>
+
+                <div class="mt-3">
+                    <form method="post" action="index.php" style="display: inline;">
+                        <input type="hidden" name="domainid" value="<?php echo $domain_id ?>">
+                        <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
+                    </form>
+                    <a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
+                </div>
+            </div>
+
+            <?php
+        } else {
+            ?>
+
+            <div class="container-fluid mt-3">
+                <h3 class="mb-3">Fehler/h3>
+
+                    <span class="mb-3">
+                Es ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Webmaster zur Lösung des Problems.<br>
+                Die Domain <?php echo $domain_name ?> mit der ID <?php echo $domain_id ?> konnte nicht gelöscht werden.
+            </span>
+            </div>
+
+            <?php
+        }
+    } else {
+        ?>
+
+        <div class="container-fluid mt-3">
+            <h3 class="mb-3">Keine Rechte</h3>
+
+            <span class="mb-3">
+                Da Sie nicht der Domain-Admin sind, haben Sie nicht die Rechte, die Domain mit der ID
+                <?php echo $domain_id ?> zu löschen.
+            </span>
+        </div>
+
+        <?php
+    }
+
+} else {
+    //Der Benutzer ist nicht angemeldet
     ?>
 
     <div class="container-fluid mt-3">
-        <h3 class="mb-3">Domain löschen</h3>
+        <h3 class="mb-3">Nicht angemeldet</h3>
 
-        <!-- TODO: Die Nachricht muss angepasst werden -->
         <span class="mb-3">
-			Sind Sie sicher, dass Sie die Domain <?php echo $domain_name ?> mit der ID <?php echo $domain_id ?> löschen wollen?<br>
-			Wenn Sie die Domain löschen, werden auch alle zugehörigen Mailboxen und Verteiler gelöscht.
-		</span>
-
-        <!-- TODO: Links müssen logischerweise noch angepasst werden -->
-        <div class="mt-3">
-            <form method="post" action="index.php" style="display: inline;">
-                <input type="hidden" name="domainid" value="1"><!-- TODO: Wert ist immer die ID der zu löschenden Domain -->
-                <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
-            </form>
-            <a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
-        </div>
+            Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+            <a href="../login/">Hier geht es zum Login</a>
+        </span>
     </div>
-
-    <?php
-} else {
-    ?>
-
-    <!-- TODO: Unterscheidung zwischen nicht angemeldet, keine Rechte und sonstigen Fehlern -->
-    ES IST EIN FEHLER AUFGETRETEN!!!11!1!!1!11!
 
     <?php
 }
