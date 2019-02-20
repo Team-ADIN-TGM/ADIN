@@ -30,8 +30,6 @@ TODO:
 <body>
 	<?php
 		$user_logged_in = isset($_SESSION["user"]);
-		$logged_in_username = 3; //TODO: Change to user ID from Session Variable
-
 		$user_has_rights = false;
 		$noerror = true;
 		$domain_id = intval($_GET["id"]);
@@ -41,26 +39,34 @@ TODO:
 		$sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
 INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
 INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-WHERE Admins_tbl.UserName = ?";
+WHERE AdminId = ?";
 
 		//Erstellen eines Prepared Statements
 		if ($prep_stmt = $conn->prepare($sql)) {
 
-            $prep_stmt->bind_param("i", $logged_in_usernameg);
-            $prep_stmt->execute();
-            $prep_stmt->get_result();
+            /*
+             * Einsetzen der Parameter und Ausführen des Prepared Statements
+             * Viele PHP-Funktionen geben als Parameter einen boolean-Wert zurück, der anzeigt, ob ein Fehler
+             * aufgetreten ist. Das kann man für Fehlerbehandlung nutzen.
+             */
+            if (!$noerror) $noerror = $prep_stmt->bind_param("i", $domain_id);
+            if (!$noerror) $noerror = $prep_stmt->execute();
+            if (!$noerror) $res = $prep_stmt->get_result();
+            if ($res == false) $noerror = false;
 
-            //Prüfen, ob die zu löschende Domain in der Menge der Domains enthalten ist, für die der Benutzer Rechte hat
-            while ($row = $res->fetch_assoc()) {
-                if ($row["DomainId"] == $domain_id) {
-                    $user_has_rights = true;
-                    $domain_name = $row["DomainName"];
+            if ($noerror) {
+                echo "no error";
+                //Prüfen, ob die zu löschende Domain in der Menge der Domains enthalten ist, für die der Benutzer Rechte hat
+                while ($row = $res->fetch_assoc()) {
+                    if ($row["DomainId"] == $domain_id) {
+                        $user_has_rights = true;
+                        $domain_name = $row["DomainName"];
+                    }
                 }
             }
-
-            echo "Check for rights finished - result: ".(($user_has_rights) ? "true" : "false");
+            echo "Check for rights finished - result: ".strval($user_has_rights);
         } else {
-		    echo "meeeeh";
+		    $noerror = false;
         }
 	
 		//Wenn der Benutzer angemeldet ist, die Rechte hat und kein Fehler aufgetreten ist
@@ -91,7 +97,7 @@ WHERE Admins_tbl.UserName = ?";
 	?>
 	
 	<!-- TODO: Unterscheidung zwischen nicht angemeldet, keine Rechte und sonstigen Fehlern -->
-	ES IST EIN FEHLER AUFGETRETEN!!!11!1!!1!11!
+	<h1>ES IST EIN FEHLER AUFGETRETEN!!!11!1!!1!11!</h1>
 
 	<?php 
 		}
