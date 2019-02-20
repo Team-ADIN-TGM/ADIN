@@ -107,7 +107,7 @@ if ($user_logged_in) {
                 </span>
 
                 <div class="mt-3">
-                    <form method="post" action="index.php" style="display: inline;">
+                    <form method="post" action="../domains" style="display: inline;">
                         <input type="hidden" name="domainid" value="<?php echo $domain_id ?>">
                         <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
                     </form>

@@ -1,13 +1,14 @@
 <!--
 TODO:
-- Dynamisches Auslesen der Datenbank und füllen der Tabelle
-- Setzen der Links zu delete/new/update-Seiten
 - Reagieren auf Aktionen in den delete/new/update-Seiten
+- Evtl. einen Neu-laden-Button (neu laden mit F5 sendet eventuell vorhandene GET- und POST-Parameter erneut)
 -->
 
 <?php
 	session_start();
 	include "../connect.php";
+
+    $userid = $_SESSION["userid"];
 
 	if (isset($_POST["delete"])) {
 	    /*
@@ -16,7 +17,6 @@ TODO:
 	     * Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen Rechte hat.
 	     */
 	    $domainid = $_POST["domainid"];
-	    $userid = $_SESSION["userid"];
 
 	    //TODO: Für Fehlerbehandlung
         $noerror = true;
@@ -46,6 +46,10 @@ TODO:
             $res = $conn->query("DELETE FROM Domains_tbl WHERE DomainId = $domainid;");
             if (!$res) echo "Beim Löschen der Domain ist ein Fehler aufgetreten";
         }
+    } elseif (isset($_POST["insert"])) {
+
+    } elseif (isset($_POST["update"])) {
+
     }
 ?>
 <!DOCTYPE html>
@@ -123,25 +127,50 @@ TODO:
             <?php
                 //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
                 //TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können!
+
+                if ($_SESSION["usertype"] == "superuser") {
+                    //Alle Domains anzeigen
+                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.Email FROM Domains_tbl
+                    INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                    LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId;";
+                } else {
+                    //echo "userid: ".$_SESSION["userid"]."//$userid";
+
+                    //Delegated Admin - Nur die Domains auslesen, für die der Benutzer Domain-Admin ist
+                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.Email FROM Domains_tbl
+                    INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                    LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
+                    WHERE Admins_tbl.AdminId = $userid;";
+
+                    //echo $sql;
+                }
+
+                $res = $conn->query($sql);
+
+                while ($row = $res->fetch_assoc()) {
+                    ?>
+
+                    <tr>
+                        <td class="overview-table-content-cell"><?php echo $row["DomainId"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["DomainName"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["Username"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["Email"] ?></td>
+                        <td class="overview-table-button-cell">
+                            <a href="update.php?id=<?php echo $row["DomainId"]; ?>">
+                                <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
+                            </a>
+                        </td>
+                        <td class="overview-table-button-cell">
+                            <a href="delete.php?id=<?php echo $row["DomainId"]; ?>">
+                                <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
+                            </a>
+                        </td>
+                    </tr>
+
+                    <?php
+                }
             ?>
-            <!--
-			<tr>
-				<td class="overview-table-content-cell">1</td>
-				<td class="overview-table-content-cell">test.dns.or.at</td>
-				<td class="overview-table-content-cell">mfrank</td>
-				<td class="overview-table-content-cell">mfrank@flashbrother.net</td>
-				<td class="overview-table-button-cell">
-					<a href="update.php" target="_blank">
-						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
-					</a>
-				</td>
-				<td class="overview-table-button-cell">
-					<a href="delete.php" target="_blank">
-						<img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
-					</a>
-				</td>
-			</tr>
-            -->
+
 		</table>
 		
 		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
@@ -151,9 +180,15 @@ TODO:
 	</div>
 	
 	<?php else: ?>
-	
-	<p>Sie sind nicht angemeldet!</p>
-    <a href="../login/">Login</a>
+
+    <div class="container-fluid mt-3">
+        <h3 class="mb-3">Nicht angemeldet</h3>
+
+        <span class="mb-3">
+        Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+        <a href="../login/">Hier geht es zum Login</a>
+    </span>
+    </div>
 	
 	<?php endif; ?>	
 </body>

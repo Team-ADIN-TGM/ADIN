@@ -1,8 +1,10 @@
 <!--
 TODO:
-- Überprüfen, ob der Benutzer die notwendigen Rechte hat, um die Mailbox zu bearbeiten
-- Daten aus der Datenbank auslesen und alle Eingabefelder ausfüllen (außer die Passwörter)
-- Das Domain-Dropdown mit Domains füllen, für die der Benutzer die Rechte hat
+- Überprüfen, ob der Benutzer die notwendigen Rechte hat, um die Domain zu bearbeiten
+- Daten aus der Datenbank auslesen und alle Eingabefelder ausfüllen
+- Für Superuser: Admin-Dropdown mit allen Benutzern füllen, active
+  Für Delegated Admins: Admin-Dropdown nur mit eigenem Nutzernamen füllen, inaktiv (nicht bearbeitbar), mit Anmerkung:
+  Sie können keinen anderen Domain-Admin zuweisen, weil Sie nicht Superuser sind
 -->
 <?php 
 	session_start(); 

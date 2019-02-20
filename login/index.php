@@ -30,9 +30,6 @@ include '../connect.php';
                             $prep_stmt = $conn->prepare($sql);
                             $prep_stmt->bind_param("ss", $username, $password);
 
-                            //TODO: Entfernen, nur zum Debuggen
-                            echo "SELECT * FROM Admins_tbl WHERE Username = '$username' AND Password = '$password';";
-
                             $prep_stmt->execute();
                             $res = $prep_stmt->get_result();
 
