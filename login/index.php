@@ -42,6 +42,7 @@ include '../connect.php';
                                 session_start();
                                 $_SESSION["user"] = $userdata["Username"];
                                 $_SESSION["userid"] = $userdata["AdminId"];
+                                $_SESSION["usertype"] = $userdata["UserType"];
                                 header("Location: ../home/index.php");
                             } elseif ($res->num_rows == 0) {
                                 //Es gibt keine Übereinstimmung, Benutzername oder Passwort falsch

@@ -120,12 +120,16 @@ TODO:
 				<th class="overview-table-button-cell"></th>
 				<th class="overview-table-button-cell"></th>
 			</tr>
+            <?php
+                //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
+                //TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können!
+            ?>
+            <!--
 			<tr>
 				<td class="overview-table-content-cell">1</td>
 				<td class="overview-table-content-cell">test.dns.or.at</td>
 				<td class="overview-table-content-cell">mfrank</td>
 				<td class="overview-table-content-cell">mfrank@flashbrother.net</td>
-				<!-- TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
 				<td class="overview-table-button-cell">
 					<a href="update.php" target="_blank">
 						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
@@ -137,6 +141,7 @@ TODO:
 					</a>
 				</td>
 			</tr>
+            -->
 		</table>
 		
 		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">

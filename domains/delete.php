@@ -45,44 +45,56 @@ if ($user_logged_in) {
     $user_has_rights = false; //Wird auf true gesetzt, wenn der Benutzer die Rechte hat, um die Domain zu löschen
     $noerror = true; //Wird auf false gesetzt, wenn ein Fehler aufgetreten ist
     $domain_id = intval($_GET["id"]); //Die ID der zu löschenden Domain, übergeben per URL (delete.php?id=3)
-    //$domain_name = "";
 
-    /*
-     * SQL-Statement zum Überprüfen, ob der Benutzer die Rechte hat, die Domain zu löschen
-     * Gibt die Domain-ID und den Domain-Namen aller Domains zurück, die den übergebenen Admin als Domain-Admin haben.
-     * Jede Domain kann nur einen Domain-Admin haben
-     */
-    $sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
-    INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
-    INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-    WHERE Admins_tbl.AdminId = ?";
 
-    //Erstellen eines PreparedStatements und setzen des Parameters
-    $prep_stmt = $conn->prepare($sql);
-    $prep_stmt->bind_param("i", $logged_in_user);
+    if ($_SESSION["usertype"] == "superuser") {
+        //Superuser können alle Domains löschen
+        $user_has_rights = true;
 
-    //Ausführen und laden des Ergebnisses
-    $prep_stmt->execute();
-    $res = $prep_stmt->get_result();
+        //Der Domain-Name muss noch aus der Datenbank ausgelesen werden
+        $res = $conn->query("SELECT DomainName FROM Domains_tbl WHERE DomainId = $domain_id;");
+        if ($res->num_rows == 1) {
+            $domain_name = $res->fetch_assoc()["DomainName"];
+        } else {
+            $noerror = true;
+        }
+    } else {
+        /*
+         * Delegated Admins können nur die Domains löschen, deren Domain-Admin sie sind. Das muss hier überprüft werden.
+         * SQL-Statement zum Überprüfen, ob der Benutzer die Rechte hat, die Domain zu löschen
+         * Gibt die Domain-ID und den Domain-Namen aller Domains zurück, die den übergebenen Admin als Domain-Admin haben.
+         * Jede Domain kann nur einen Domain-Admin haben
+         */
+        $sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
+        INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+        INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
+        WHERE Admins_tbl.AdminId = ?";
 
-    /*
-     * Jetzt wird das Ergebnis mit einer Schleife durchlaufen. Wenn eine enthaltene Domain-ID zu der in der URL über-
-     * gebenen Domain-ID passt, bedeutet das, dass der Benutzer die Rechte hat, um die Domain zu löschen.
-     */
-    while ($row = $res->fetch_assoc()) {
-        if ($row["DomainId"] == $domain_id) {
-            //Domain wurde gefunden - Benutzer hat Rechte
-            $user_has_rights = true;
-            $domain_name = $row["DomainName"];
-            break;
+        //Erstellen eines PreparedStatements und setzen des Parameters
+        $prep_stmt = $conn->prepare($sql);
+        $prep_stmt->bind_param("i", $logged_in_user);
+
+        //Ausführen und laden des Ergebnisses
+        $prep_stmt->execute();
+        $res = $prep_stmt->get_result();
+
+        /*
+         * Jetzt wird das Ergebnis mit einer Schleife durchlaufen. Wenn eine enthaltene Domain-ID zu der in der URL über-
+         * gebenen Domain-ID passt, bedeutet das, dass der Benutzer die Rechte hat, um die Domain zu löschen.
+         */
+        while ($row = $res->fetch_assoc()) {
+            if ($row["DomainId"] == $domain_id) {
+                //Domain wurde gefunden - Benutzer hat Rechte
+                $user_has_rights = true;
+                $domain_name = $row["DomainName"];
+                break;
+            }
         }
     }
 
     if ($user_has_rights) {
         if ($noerror) {
-            /*
-             * * Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
-             */
+            //Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
             ?>
 
             <div class="container-fluid mt-3">
@@ -125,8 +137,8 @@ if ($user_logged_in) {
             <h3 class="mb-3">Keine Rechte</h3>
 
             <span class="mb-3">
-                Da Sie nicht der Domain-Admin sind, haben Sie nicht die Rechte, die Domain mit der ID
-                <?php echo $domain_id ?> zu löschen.
+                Da Sie nicht der Domain-Admin und auch kein Superuser sind, haben Sie nicht die Rechte, die Domain mit
+                der ID <?php echo $domain_id ?> zu löschen.
             </span>
         </div>
 
