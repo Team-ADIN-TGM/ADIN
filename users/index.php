@@ -63,7 +63,7 @@ TODO:
 				</a>
 			</div>
             <div class="navbar-item adin-navbar-item">
-                <a class="adin-navbar-link" href="../login/logout.php/">
+                <a class="adin-navbar-link" href="../login/logout.php">
                     <img class="adin-navbar-item-img" src="../img/logout.png">
                     <p class="adin-navbar-item-text">Logout</p>
                 </a>
