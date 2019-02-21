@@ -7,7 +7,7 @@ TODO:
 session_start();
 include "../connect.php";
 
-//Turn on error reporting
+//TODO: Remove, just for debugging // Turn on error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 ini_set('display_startup_errors', true);
@@ -35,7 +35,7 @@ ini_set('display_startup_errors', true);
 
 <?php
 
-//SCHRITT 1: ÜBERPRÜFEN, OB BENUTZER EINGELOGGT IST
+//Es wird geprüft, ob der Benutzer eingeloggt ist
 $user_logged_in = isset($_SESSION["user"]); //true wenn Benutzer eingeloggt
 
 if ($user_logged_in) {
@@ -68,27 +68,29 @@ if ($user_logged_in) {
         $sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
         INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
         INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-        WHERE Admins_tbl.AdminId = ?";
+        WHERE Admins_tbl.AdminId = ? AND Domains_tbl.DomainId = ?";
 
         //Erstellen eines PreparedStatements und setzen des Parameters
         $prep_stmt = $conn->prepare($sql);
-        $prep_stmt->bind_param("i", $logged_in_user);
+        $prep_stmt->bind_param("ii", $logged_in_user, $domain_id);
 
         //Ausführen und laden des Ergebnisses
         $prep_stmt->execute();
         $res = $prep_stmt->get_result();
 
         /*
-         * Jetzt wird das Ergebnis mit einer Schleife durchlaufen. Wenn eine enthaltene Domain-ID zu der in der URL über-
-         * gebenen Domain-ID passt, bedeutet das, dass der Benutzer die Rechte hat, um die Domain zu löschen.
+         * Wenn das Ergebnis eine Zeile hat, ist in der Datenbank der angemeldete Benutzer als Domain-Admin der Domain
+         * eingetragen. Er darf daher die Domain löschen.
          */
-        while ($row = $res->fetch_assoc()) {
-            if ($row["DomainId"] == $domain_id) {
-                //Domain wurde gefunden - Benutzer hat Rechte
-                $user_has_rights = true;
-                $domain_name = $row["DomainName"];
-                break;
-            }
+        if ($res->num_rows == 1) {
+            $user_has_rights = true;
+            $domain_name = $res->fetch_assoc()["DomainName"];
+        } elseif ($res->num_rows > 1) {
+            //Darf nicht passieren - hier kommt es zu einem Fehler
+            $noerror = false;
+        } else {
+            //0 Ergebniszeilen bedeutet, dass der Benutzer die Rechte nicht hat
+            $user_has_rights = false;
         }
     }
 
@@ -134,7 +136,7 @@ if ($user_logged_in) {
         ?>
 
         <div class="container-fluid mt-3">
-            <h3 class="mb-3">Keine Rechte</h3>
+            <h3 class="mb-3">Keine Berechtigung</h3>
 
             <span class="mb-3">
                 Da Sie nicht der Domain-Admin und auch kein Superuser sind, haben Sie nicht die Rechte, die Domain mit

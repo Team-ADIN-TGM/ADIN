@@ -2,6 +2,9 @@
 TODO:
 - Reagieren auf Aktionen in den delete/new/update-Seiten
 - Evtl. einen Neu-laden-Button (neu laden mit F5 sendet eventuell vorhandene GET- und POST-Parameter erneut)
+- Buttons zum Löschen/bearbeiten/etc sollte man nur sehen, wenn man auch die Rechte hat, die Aktionen durchzuführen
+- Was passiert, wenn eine Domain hinzugefügt werden soll, die schon existiert? Oder eine Domain, die nicht dem richtigen
+  Format entspricht? Wo wird die Fehlermeldung angezeigt?
 -->
 
 <?php
@@ -18,7 +21,7 @@ TODO:
 	     */
 	    $domainid = $_POST["domainid"];
 
-	    //TODO: Für Fehlerbehandlung
+	    //TODO: Fehlerbehandlung
         $noerror = true;
 
 	    //Überprüfung, ob ein Benutzer eingeloggt ist
@@ -47,9 +50,37 @@ TODO:
             if (!$res) echo "Beim Löschen der Domain ist ein Fehler aufgetreten";
         }
     } elseif (isset($_POST["insert"])) {
+        /*
+	     * Es soll eine Domain hinzugefügt werden. Wenn das POST-Parameter insert gesetzt ist, heißt das, dass die von
+         * new.php kommt. Es muss trotzdem noch einmal geprüft werden, ob der Benutzer Superuser ist, denn nur
+         * Superuser können neue Domains hinzufügen
+	     */
 
+        if ($_SESSION["usertype"] == "superuser") {
+            //Der Benutzer hat die Rechte, eine neue Domain hinzuzufügen
+            $domain_name = $_POST["domainname"];
+            $domain_admin = intval($_POST["domainadmin"]);
+
+            /*
+             * TODO:
+             * - Überprüfung ob Domain schon vorhanden (was wenn ja??)
+             * - Überprüfung des Domain-Namens, ob er dem richtigen Format entspricht (evtl. mit Regex?)
+             *   --> STANDARDISIERT!!! Keine eigene RegEx schreiben!
+             * - INSERT in Domains_tbl:
+             *   INSERT INTO Domains_tbl (DomainName) VALUES ('example.contoso.com');
+             * - Auslesen der ID, die der Domain zugewiesen wurde
+             *   SELECT DomainId FROM Domains_tbl WHERE DomainName = 'example.contoso.com';
+             * - INSERT in Domains_extend_tbl:
+             *   INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (id, admin);
+             */
+
+        }
     } elseif (isset($_POST["update"])) {
-
+        /*
+	     * Es soll eine Domain aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass die
+         * Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
+         * einmal die Rechte geprüft werden (nur der Domain-Admin und Superuser können Domains ändern).
+	     */
     }
 ?>
 <!DOCTYPE html>
@@ -134,15 +165,11 @@ TODO:
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId;";
                 } else {
-                    //echo "userid: ".$_SESSION["userid"]."//$userid";
-
                     //Delegated Admin - Nur die Domains auslesen, für die der Benutzer Domain-Admin ist
                     $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.Email FROM Domains_tbl
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
                     WHERE Admins_tbl.AdminId = $userid;";
-
-                    //echo $sql;
                 }
 
                 $res = $conn->query($sql);
@@ -172,7 +199,7 @@ TODO:
             ?>
 
 		</table>
-		
+
 		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
 			<img src="../img/add.png" class="mr-3">
 			Neue Domain hinzufügen
