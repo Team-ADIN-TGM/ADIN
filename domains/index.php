@@ -20,12 +20,14 @@ TODO:
 	     * Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen Rechte hat.
 	     */
 	    $domainid = $_POST["domainid"];
+	    echo "DELETE $domainid";
 
 	    //TODO: Fehlerbehandlung
         $noerror = true;
 
 	    //Überprüfung, ob ein Benutzer eingeloggt ist
 	    $user_logged_in = isset($_SESSION["user"]);
+        echo ($user_logged_in ? "logged in" : "not logged in");
 
 	    //Schnelle Überprüfung auf Berechtigungen
         $sql = "SELECT Domains_tbl.DomainId FROM Domains_tbl
@@ -40,6 +42,7 @@ TODO:
                 //Domain wurde gefunden - Benutzer hat Rechte
                 $user_has_rights = true;
                 $domain_name = $row["DomainName"];
+                echo "user has rights";
                 break;
             }
         }
