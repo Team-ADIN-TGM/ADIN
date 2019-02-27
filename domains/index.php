@@ -49,10 +49,11 @@ TODO:
                 //Domain wurde gefunden - Benutzer hat Rechte
                 $user_has_rights = true;
                 $domain_name = $row["DomainName"];
-                echo "user has rights";
                 break;
             }
         }
+
+        echo ($user_has_rights ? "user has rights" : "user has no rights");
 
         if ($user_logged_in && $user_has_rights && $noerror) {
             //Überprüfungen abgeschlossen - Domain kann gelöscht werden
