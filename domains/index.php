@@ -37,7 +37,7 @@ TODO:
 
         if ($user_logged_in && $user_has_rights) {
             //Überprüfungen abgeschlossen - Domain kann gelöscht werden
-            $res = $conn->query("DELETE FROM Domains_tbl WHERE DomainId = $domainid;");
+            $res = $conn->query("DELETE FROM Domains_tbl WHERE DomainId = $domain_id;");
             if (!$res) echo "Beim Löschen der Domain ist ein Fehler aufgetreten";
         }
     } elseif (isset($_POST["insert"])) {
