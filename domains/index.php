@@ -26,36 +26,15 @@ TODO:
          * von delete.php kommt. Der Benutzer hat also schon bestätigt, dass die Domain gelöscht werden soll.
 	     * Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen Rechte hat.
 	     */
-	    $domainid = $_POST["domainid"];
-	    echo "DELETE $domainid";
-
-	    //TODO: Fehlerbehandlung
-        $noerror = true;
+	    $domain_id = $_POST["domainid"];
 
 	    //Überprüfung, ob ein Benutzer eingeloggt ist
 	    $user_logged_in = isset($_SESSION["user"]);
-        echo ($user_logged_in ? "logged in" : "not logged in");
 
-	    //Schnelle Überprüfung auf Berechtigungen
-        $sql = "SELECT Domains_tbl.DomainId FROM Domains_tbl
-        INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
-        INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-        WHERE Admins_tbl.AdminId = $userid;";
-        $res = $conn->query($sql);
+        //Überprüfung der Rechte
+        $user_has_rights = current_user_has_rights_for_domain($domain_id, "delete");
 
-        $user_has_rights = false;
-        while ($row = $res->fetch_assoc()) {
-            if ($row["DomainId"] == $domainid) {
-                //Domain wurde gefunden - Benutzer hat Rechte
-                $user_has_rights = true;
-                $domain_name = $row["DomainName"];
-                break;
-            }
-        }
-
-        echo ($user_has_rights ? "user has rights" : "user has no rights");
-
-        if ($user_logged_in && $user_has_rights && $noerror) {
+        if ($user_logged_in && $user_has_rights) {
             //Überprüfungen abgeschlossen - Domain kann gelöscht werden
             $res = $conn->query("DELETE FROM Domains_tbl WHERE DomainId = $domainid;");
             if (!$res) echo "Beim Löschen der Domain ist ein Fehler aufgetreten";

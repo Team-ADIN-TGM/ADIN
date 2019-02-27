@@ -6,6 +6,7 @@ TODO:
 <?php
 session_start();
 include "../connect.php";
+include "../functions.php";
 
 //TODO: Remove, just for debugging // Turn on error reporting
 error_reporting(E_ALL);
@@ -42,61 +43,16 @@ if ($user_logged_in) {
     //Jetzt werden die Rechte geprüft
 
     $logged_in_user = $_SESSION["userid"];
-    $user_has_rights = false; //Wird auf true gesetzt, wenn der Benutzer die Rechte hat, um die Domain zu löschen
-    $noerror = true; //Wird auf false gesetzt, wenn ein Fehler aufgetreten ist
     $domain_id = intval($_GET["id"]); //Die ID der zu löschenden Domain, übergeben per URL (delete.php?id=3)
+    $user_has_rights = current_user_has_rights_for_domain($domain_id, "delete");
 
-
-    if ($_SESSION["usertype"] == "superuser") {
-        //Superuser können alle Domains löschen
-        $user_has_rights = true;
-
+    if ($user_has_rights) {
         //Der Domain-Name muss noch aus der Datenbank ausgelesen werden
         $res = $conn->query("SELECT DomainName FROM Domains_tbl WHERE DomainId = $domain_id;");
         if ($res->num_rows == 1) {
             $domain_name = $res->fetch_assoc()["DomainName"];
-        } else {
-            $noerror = true;
-        }
-    } else {
-        /*
-         * Delegated Admins können nur die Domains löschen, deren Domain-Admin sie sind. Das muss hier überprüft werden.
-         * SQL-Statement zum Überprüfen, ob der Benutzer die Rechte hat, die Domain zu löschen
-         * Gibt die Domain-ID und den Domain-Namen aller Domains zurück, die den übergebenen Admin als Domain-Admin haben.
-         * Jede Domain kann nur einen Domain-Admin haben
-         */
-        $sql = "SELECT Domains_tbl.DomainId, DomainName FROM Domains_tbl
-        INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
-        INNER JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
-        WHERE Admins_tbl.AdminId = ? AND Domains_tbl.DomainId = ?";
 
-        //Erstellen eines PreparedStatements und setzen des Parameters
-        $prep_stmt = $conn->prepare($sql);
-        $prep_stmt->bind_param("ii", $logged_in_user, $domain_id);
-
-        //Ausführen und laden des Ergebnisses
-        $prep_stmt->execute();
-        $res = $prep_stmt->get_result();
-
-        /*
-         * Wenn das Ergebnis eine Zeile hat, ist in der Datenbank der angemeldete Benutzer als Domain-Admin der Domain
-         * eingetragen. Er darf daher die Domain löschen.
-         */
-        if ($res->num_rows == 1) {
-            $user_has_rights = true;
-            $domain_name = $res->fetch_assoc()["DomainName"];
-        } elseif ($res->num_rows > 1) {
-            //Darf nicht passieren - hier kommt es zu einem Fehler
-            $noerror = false;
-        } else {
-            //0 Ergebniszeilen bedeutet, dass der Benutzer die Rechte nicht hat
-            $user_has_rights = false;
-        }
-    }
-
-    if ($user_has_rights) {
-        if ($noerror) {
-            //Der Benutzer hat die Rechte und es ist kein Fehler aufgetreten - die Domain kann gelöscht werden
+            //Der Benutzer hat die Rechte - die Domain kann gelöscht werden
             ?>
 
             <div class="container-fluid mt-3">
@@ -118,19 +74,6 @@ if ($user_logged_in) {
             </div>
 
             <?php
-        } else {
-            ?>
-
-            <div class="container-fluid mt-3">
-                <h3 class="mb-3">Fehler/h3>
-
-                    <span class="mb-3">
-                Es ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Webmaster zur Lösung des Problems.<br>
-                Die Domain <?php echo $domain_name ?> mit der ID <?php echo $domain_id ?> konnte nicht gelöscht werden.
-            </span>
-            </div>
-
-            <?php
         }
     } else {
         ?>
@@ -139,8 +82,8 @@ if ($user_logged_in) {
             <h3 class="mb-3">Keine Berechtigung</h3>
 
             <span class="mb-3">
-                Da Sie nicht der Domain-Admin und auch kein Superuser sind, haben Sie nicht die Rechte, die Domain mit
-                der ID <?php echo $domain_id ?> zu löschen.
+                Da Sie kein Superuser sind, haben Sie nicht die Rechte, die Domain mit der ID <?php echo $domain_id ?>
+                zu löschen. Bitte wenden Sie sich an einen Superuser.
             </span>
         </div>
 
