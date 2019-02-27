@@ -13,6 +13,13 @@ TODO:
 
     $userid = $_SESSION["userid"];
 
+
+    if (isset($_POST["delete"])) {
+        echo "_POST[delete] is set";
+    } else {
+        echo "_POST[delete] is not set";
+    }
+
 	if (isset($_POST["delete"])) {
 	    /*
 	     * Es soll eine Domain gelöscht werden. Wenn das POST-Parameter delete gesetzt ist, heißt das, dass die Anfrage
