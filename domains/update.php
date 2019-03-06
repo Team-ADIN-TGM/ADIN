@@ -1,9 +1,4 @@
-<!--
-TODO:
-- Daten aus der Datenbank auslesen und alle Eingabefelder ausfüllen
-- Für Superuser: Admin-Dropdown mit allen Benutzern füllen, active
--->
-<?php 
+<?php
 	session_start(); 
 	include "../connect.php";
 	include "../functions.php";
@@ -62,7 +57,6 @@ TODO:
                             <input type="text" class="form-control" name="domainname" value="<?php echo $domain_name ?>">
                         </div>
 
-                        <!-- TODO: Dropdown muss mit existierenden Domain-Admins gefüllt werden -->
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Domain-Admin</span>

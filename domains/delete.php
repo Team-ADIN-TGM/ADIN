@@ -77,8 +77,8 @@ if ($user_logged_in) {
             <h3 class="mb-3">Keine Berechtigung</h3>
 
             <span class="mb-3">
-                Da Sie kein Superuser sind, haben Sie nicht die Rechte, die Domain mit der ID <?php echo $domain_id ?>
-                zu löschen. Bitte wenden Sie sich an einen Superuser.
+                Da Sie kein Superuser sind, können Sie keine Domains löschen. Bitte wenden Sie sich dazu an
+                <a href="mailto:bla@wtf.com">Email</a>. <!-- TODO: Kontakt-Adresse hinzufügen -->
             </span>
         </div>
 

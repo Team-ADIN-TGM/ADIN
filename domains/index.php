@@ -1,6 +1,5 @@
 <!--
 TODO:
-- Reagieren auf Aktionen in den delete/new/update-Seiten
 - Evtl. einen Neu-laden-Button (neu laden mit F5 sendet eventuell vorhandene GET- und POST-Parameter erneut)
 - Buttons zum Löschen/bearbeiten/etc sollte man nur sehen, wenn man auch die Rechte hat, die Aktionen durchzuführen
 - Was passiert, wenn eine Domain hinzugefügt werden soll, die schon existiert? Oder eine Domain, die nicht dem richtigen
@@ -67,6 +66,7 @@ ini_set('display_startup_errors', true);
             $domain_admin = intval($_POST["domainadmin"]);
 
             // 1. ÜBERPRÜFEN, OB DIE DOMAIN SCHON VORHANDEN IST
+            //TODO: Überprüfen, ob Domain der Regex entspricht
             $res = $conn->query("SELECT * FROM Domains_tbl WHERE DomainName = '$domain_name';");
             if ($res->num_rows == 0) {
                 //Die Domain ist noch nicht vorhanden
