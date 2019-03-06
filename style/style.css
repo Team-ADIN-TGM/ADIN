@@ -4,7 +4,7 @@
 
 /* Zum Setzen der Farbe */
 .adin {
-    background-color: #36747e;
+    background-color: #36747e !important;
 }
 
 
@@ -94,12 +94,12 @@
  *********************************************/
 
 .adin-button {
-	background-color: #36747e;
-	color: white;
+	background-color: #36747e !important;
+	color: white !important;
 }
 .adin-button:hover {
-	background-color: #4f858e;
-	color: white;
+	background-color: #4f858e !important;
+	color: white !important;
 }
 
 .input-group-text-midinput {
