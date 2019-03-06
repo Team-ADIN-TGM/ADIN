@@ -38,10 +38,10 @@ TODO
 //Es wird geprüft, ob der Benutzer eingeloggt ist
 $user_logged_in = isset($_SESSION["user"]); //true wenn Benutzer eingeloggt
 
-if (isset($_SESSION["user"])) {
+if ($user_logged_in) {
     //Der Benutzer ist angemeldet
 
-    if (isset($_SESSION["user"]) && $_SESSION["usertype"] == "superuser") {
+    if (current_user_has_rights_for_domain("new", -1)) {
         //Nur Superuser können neue Domains hinzufügen
         ?>
 

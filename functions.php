@@ -56,4 +56,3 @@ function user_has_rights_for_domain($action, $userid, $domainid) {
 function current_user_has_rights_for_domain($action, $domainid) {
     return (isset($_SESSION["userid"]) && ($_SESSION["usertype"] == "superuser"));
 }
-?>

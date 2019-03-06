@@ -51,7 +51,7 @@ ini_set('display_startup_errors', true);
 	    $domain_id = $_POST["domainid"];
 
         //Überprüfung der Rechte
-        $user_has_rights = current_user_has_rights_for_domain($domain_id, "delete");
+        $user_has_rights = current_user_has_rights_for_domain("delete", $domain_id);
 
         if ($user_logged_in && $user_has_rights) {
             //Überprüfungen abgeschlossen - Domain kann gelöscht werden
@@ -62,10 +62,10 @@ ini_set('display_startup_errors', true);
         /*
 	     * Es soll eine Domain hinzugefügt werden. Wenn das POST-Parameter insert gesetzt ist, heißt das, dass die von
          * new.php kommt. Es muss trotzdem noch einmal geprüft werden, ob der Benutzer Superuser ist, denn nur
-         * Superuser können neue Domains hinzufügen
+         * Superuser können neue Domains hinzufügen.
 	     */
 
-        if ($_SESSION["usertype"] == "superuser") {
+        if (current_user_has_rights_for_domain("new", -1)) {
             //Der Benutzer hat die Rechte, eine neue Domain hinzuzufügen
             $domain_name = $_POST["domainname"];
             $domain_admin = intval($_POST["domainadmin"]);
@@ -74,7 +74,6 @@ ini_set('display_startup_errors', true);
             $res = $conn->query("SELECT * FROM Domains_tbl WHERE DomainName = '$domain_name';");
             if ($res->num_rows == 0) {
                 //Die Domain ist noch nicht vorhanden
-                echo "Domain noch nicht vorhanden";
 
                 // 2. HINZUFÜGEN DER DOMAIN IN Domains_tbl
                 $prep_stmt = $conn->prepare("INSERT INTO Domains_tbl (DomainName) VALUES (?)");
@@ -85,7 +84,6 @@ ini_set('display_startup_errors', true);
                 // 3. AUSLESEN DER AUTOMATISCH VERGEBENEN ID
                 if ($res1) {
                     //Die Domain wurde erfolgreich in Domains_tbl hinzugefügt
-                    echo "Domain wurde hinzugefügt";
 
                     $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ?");
                     $prep_stmt->bind_param("s", $domain_name);
@@ -96,7 +94,6 @@ ini_set('display_startup_errors', true);
                     // 4. HINZUFÜGEN DER DOMAIN MIT DOMAIN-ADMIN IN Domains_extend_tbl
                     if ($res2) {
                         //Die Domain-ID wurde erfolgreich ausgelesen
-                        echo "DomainId ausgelesen";
 
                         $domain_id = intval($res2->fetch_assoc()["DomainId"]);
                         $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
@@ -104,8 +101,14 @@ ini_set('display_startup_errors', true);
                         $res3 = $prep_stmt->execute();
                         $prep_stmt->close();
 
-                        if ($res3) echo "Domain wurde hinzugefügt";
+                        if (!$res3) echo "Domain wurde nicht hinzugefügt";
+                    } else {
+                        //Die Domain ID wurde nicht ausgelesen
+                        echo "Die Domain-ID konnte nicht ausgelesen werden";
                     }
+                } else {
+                    //Die Domain konnte nicht in Domains_tbl hinzugefügt werden
+                    echo "Domain konnte nicht hinzugefügt werden";
                 }
 
                 if (!$res3 || !isset($res3)) {
@@ -127,13 +130,11 @@ ini_set('display_startup_errors', true);
 
             } else {
                 //Die Domain ist schon vorhanden, kann also nicht mehr hinzugefügt werden
-                $noerror = false;
-                echo "Domain vorhanden";
+                echo "Domain bereits vorhanden";
             }
 
             /*
              * TODO:
-             * - Überprüfung ob Domain schon vorhanden (was wenn ja??)
              * - Überprüfung des Domain-Namens, ob er dem richtigen Format entspricht (evtl. mit Regex?)
              *   --> STANDARDISIERT!!! Keine eigene RegEx schreiben!
              */
@@ -145,8 +146,61 @@ ini_set('display_startup_errors', true);
         /*
 	     * Es soll eine Domain aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass die
          * Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
-         * einmal die Rechte geprüft werden (nur der Domain-Admin und Superuser können Domains ändern).
+         * einmal die Rechte geprüft werden (nur Superuser können Domains ändern).
 	     */
+
+        $domain_id = intval($_POST["domainid"]);
+        if (current_user_has_rights_for_domain("update", $domain_id)) {
+            $domain_name = $_POST["domainname"];
+            $domain_admin = $_POST["domainadmin"];
+
+            // 1. ÜBERPRÜFEN, OB DIE DOMAIN ÜBERHAUPT VORHANDEN IST
+            $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl
+                INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
+                WHERE Domains_tbl.DomainId = ?;");
+            $prep_stmt->bind_param("i", $domain_id);
+            $prep_stmt->execute();
+            $res1 = $prep_stmt->get_result();
+            $prep_stmt->close();
+
+            if ($res1->num_rows == 1) {
+                //Die Domain ist vorhanden
+
+                // 2. UPDATEN DES DOMAIN-NAMENS
+                $prep_stmt = $conn->prepare("UPDATE Domains_tbl SET DomainName = ? WHERE DomainId = ?");
+                $prep_stmt->bind_param("si", $domain_name, $domain_id);
+                $res2 = $prep_stmt->execute();
+                $prep_stmt->close();
+
+                if ($res2) {
+                    //Der Domain-Name wurde aktualisiert
+
+                    // 3. UPDATEN DES DOMAIN-ADMINS
+                    $prep_stmt = $conn->prepare("UPDATE Domains_extend_tbl SET DomainAdmin = ? WHERE DomainId = ?");
+                    $prep_stmt->bind_param("ii", $domain_admin, $domain_id);
+                    $res3 = $prep_stmt->execute();
+                    $prep_stmt->close();
+
+                    if (!isset($res3) || !$res3) {
+                        //Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten
+                        echo "Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten";
+                    }
+                } else {
+                    //Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten
+                    echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
+                }
+
+            } elseif ($res->num_rows < 1) {
+                echo "Domain nicht vorhanden";
+            } elseif ($res->num_rows > 1) {
+                echo "Fehler";
+            }
+
+        } else {
+            //Der Benutzer hat nicht die Rechte für die Domains
+            echo "Keine Rechte";
+        }
     }
 
     if ($user_logged_in) {
