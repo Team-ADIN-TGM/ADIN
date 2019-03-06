@@ -5,7 +5,16 @@
      */
 
 session_start();
-include("connect.php");
+include "connect.php";
+
+/****************************************************************************
+ *                                ALLGEMEIN                                 *
+ ****************************************************************************/
+
+
+/****************************************************************************
+ *                                  DOMAINS                                 *
+ ****************************************************************************/
 
 /**
  * Überprüft, ob der Benutzer die Rechte hat, um auf eine Domain zuzugreifen.
@@ -13,13 +22,13 @@ include("connect.php");
  * - Neu anlegen: Superuser
  * - Aktualisieren: Superuser
  * - Löschen: Superuser
- * @param $userid   int     Die ID des Benutzers (aus der Tabelle Admins_tbl aus der Datenbank)
- * @param $domainid int     Die ID der Domain (aus der Tabelle Domains_tbl aus der Datenbank)
  * @param $action   string  "new" für neu anlegen, "update" für aktualisieren und "delete" für löschen
  *                          (entsprechend den Seitennamen)
+ * @param $userid   int     Die ID des Benutzers (aus der Tabelle Admins_tbl aus der Datenbank)
+ * @param $domainid int     Die ID der Domain (aus der Tabelle Domains_tbl aus der Datenbank)
  * @return true, wenn der Benutzer die Rechte hat, sonst false
  */
-function user_has_rights_for_domain($userid, $domainid, $action) {
+function user_has_rights_for_domain($action, $userid, $domainid) {
     $res = $conn->query("SELECT UserType FROM Admins_tbl WHERE AdminId = $userid;");
     $has_rights = false;
 
@@ -39,12 +48,12 @@ function user_has_rights_for_domain($userid, $domainid, $action) {
  * - Neu anlegen: Superuser
  * - Aktualisieren: Superuser
  * - Löschen: Superuser
- * @param $domainid int     ID der Domain (aus der Tabelle Domains_tbl aus der Datenbank)
  * @param $action   string  "new" für neu anlegen, "update" für aktualisieren und "delete" für löschen
  *                          (entsprechend den Seitennamen)
+ * @param $domainid int     ID der Domain (aus der Tabelle Domains_tbl aus der Datenbank)
  * @return true, wenn der Benutzer die Rechte hat, sonst false
  */
-function current_user_has_rights_for_domain($domainid, $action) {
+function current_user_has_rights_for_domain($action, $domainid) {
     return (isset($_SESSION["userid"]) && ($_SESSION["usertype"] == "superuser"));
 }
 ?>

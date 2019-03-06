@@ -6,12 +6,39 @@ TODO:
 - Was passiert, wenn eine Domain hinzugefügt werden soll, die schon existiert? Oder eine Domain, die nicht dem richtigen
   Format entspricht? Wo wird die Fehlermeldung angezeigt?
 -->
+<?php
+session_start();
+include "../connect.php";
+include "../functions.php";
+
+//TODO: Remove, just for debugging
+// Turn on error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
+
+?>
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>ADIN - Benutzer</title>
+    <meta charset="utf-8">
+
+    <!-- Stylesheets -->
+    <link type="text/css" rel="stylesheet" href="../style/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
 
 <?php
-	session_start();
-	include "../connect.php";
-	include "../functions.php";
-
+    //Überprüfung, ob ein Benutzer eingeloggt ist
+    $user_logged_in = isset($_SESSION["user"]);
     $userid = $_SESSION["userid"];
 
 	if (isset($_POST["delete"])) {
@@ -21,9 +48,6 @@ TODO:
 	     * Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen Rechte hat.
 	     */
 	    $domain_id = $_POST["domainid"];
-
-	    //Überprüfung, ob ein Benutzer eingeloggt ist
-	    $user_logged_in = isset($_SESSION["user"]);
 
         //Überprüfung der Rechte
         $user_has_rights = current_user_has_rights_for_domain($domain_id, "delete");
@@ -44,20 +68,69 @@ TODO:
             //Der Benutzer hat die Rechte, eine neue Domain hinzuzufügen
             $domain_name = $_POST["domainname"];
             $domain_admin = intval($_POST["domainadmin"]);
+            $noerror = true;
+
+            $res = $conn->query("SELECT * FROM Domains_tbl WHERE DomainName = '$domain_name';");
+            if ($res->num_rows == 0) {
+                //Die Domain ist noch nicht vorhanden
+
+                //1. Hinzufügen der Domain in Domains_tbl
+                $sql = "INSERT INTO Domains_tbl (DomainName) VALUES (?)";
+                $prep_stmt = $conn->prepare($sql);
+                $prep_stmt->bind_param("s", $domain_name);
+                $res1 = $prep_stmt->execute();
+                $prep_stmt->close();
+
+                //2. Auslesen der automatisch vergebenen ID
+                if ($res1) {
+                    $sql = "SELECT * FROM Domains_tbl WHERE DomainName = ?";
+                    $prep_stmt = $conn->prepare($sql);
+                    $prep_stmt->bind_param("s", $domain_name);
+                    $res2 = $prep_stmt->execute();
+                    $prep_stmt->close();
+
+                    //3. Hinzufügen der Domain mit Domain-Admin in Domains_extend_tbl
+                    if ($res2) {
+                        $domain_id = intval($res->fetch_assoc()["DomainId"]);
+                        $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
+                        if ($prep_stmt) $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
+                        else echo "Error: $conn->errno // $conn->error";
+                        $res3 = $prep_stmt->execute();
+                        $prep_stmt->close();
+                    }
+                }
+
+                if (!$res3 || !isset($res3)) {
+                    /*
+                     * Fehlerfall - einer der Datenbankzugriffe ist fehlgeschlagen
+                     * Es darf natürlich keine "halbe Domain" vorhanden sein (also eine Domain, die zwar in der Tabelle
+                     * Domains_tbl, aber nicht in Domains_extend_tbl hinzugefügt wurde). Die Domain muss also wieder
+                     * aus Domains_tbl gelöscht werden.
+                     */
+                    $sql = "DELETE FROM Domains_tbl WHERE DomainName = ?";
+                    $prep_stmt = $conn->prepare($sql);
+                    $prep_stmt->bind_param("s", $domain_name);
+                    $res = $prep_stmt->execute();
+
+                    echo "Es ist ein Fehler aufgetreten<br>";
+                    echo ($res ? "Die Domain wurde erfolgreich gelöscht<br>" : "Die Domain konnte nicht gelöscht werden!<br>");
+                    echo $conn->errno." // ".$conn->error;
+                }
+
+            } else {
+                //Die Domain ist schon vorhanden, kann also nicht mehr hinzugefügt werden
+                $noerror = false;
+            }
 
             /*
              * TODO:
              * - Überprüfung ob Domain schon vorhanden (was wenn ja??)
              * - Überprüfung des Domain-Namens, ob er dem richtigen Format entspricht (evtl. mit Regex?)
              *   --> STANDARDISIERT!!! Keine eigene RegEx schreiben!
-             * - INSERT in Domains_tbl:
-             *   INSERT INTO Domains_tbl (DomainName) VALUES ('example.contoso.com');
-             * - Auslesen der ID, die der Domain zugewiesen wurde
-             *   SELECT DomainId FROM Domains_tbl WHERE DomainName = 'example.contoso.com';
-             * - INSERT in Domains_extend_tbl:
-             *   INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (id, admin);
              */
 
+        } else {
+            echo "Keine Rechte";
         }
     } elseif (isset($_POST["update"])) {
         /*
@@ -66,25 +139,10 @@ TODO:
          * einmal die Rechte geprüft werden (nur der Domain-Admin und Superuser können Domains ändern).
 	     */
     }
+
+    if ($user_logged_in) {
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-	<title>ADIN - Benutzer</title>
-	<meta charset="utf-8">
-	
-	<!-- Stylesheets -->
-	<link type="text/css" rel="stylesheet" href="../style/style.css">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-	
-	<!-- Scripts -->
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-</head>
-<body>
-	<?php if (isset($_SESSION["user"])): ?>
-	<!-- Navigationsleiste -->
+    <!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
 			<img src="../img/logo.png" id="adin-navbar-logo">
@@ -190,7 +248,8 @@ TODO:
 		</a>
 	</div>
 	
-	<?php else: ?>
+	<?php } else { ?>
+    <!-- Nicht angemeldet -->
 
     <div class="container-fluid mt-3">
         <h3 class="mb-3">Nicht angemeldet</h3>
@@ -201,6 +260,6 @@ TODO:
     </span>
     </div>
 	
-	<?php endif; ?>	
+	<?php } ?>
 </body>
 </html>

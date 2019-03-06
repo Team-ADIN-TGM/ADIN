@@ -1,12 +1,15 @@
 <!--
-TODO:
-- Dropdown für Domains mit Domains füllen, für die der Benutzer Rechte hat
+TODO
+- Clientseitiges Überprüfen der Domain mittels RegEx (muss vom Auftraggeber kommen, da er die Regeln festlegt)
+- Email-Adresse, um eine neue Domain zu beantragen
 -->
-<?php 
+
+<?php
 	session_start(); 
 	include "../connect.php";
 
-    //TODO: Remove, just for debugging // Turn on error reporting
+    //TODO: Remove, just for debugging
+    // Turn on error reporting
     error_reporting(E_ALL);
     ini_set('display_errors', true);
     ini_set('display_startup_errors', true);
@@ -35,13 +38,10 @@ TODO:
 //Es wird geprüft, ob der Benutzer eingeloggt ist
 $user_logged_in = isset($_SESSION["user"]); //true wenn Benutzer eingeloggt
 
-if ($user_logged_in) {
-    //Jetzt werden die Rechte geprüft
+if (isset($_SESSION["user"])) {
+    //Der Benutzer ist angemeldet
 
-    $logged_in_user = $_SESSION["userid"];
-    $user_has_rights = false; //Wird auf true gesetzt, wenn der Benutzer die Rechte hat, um die Domain zu löschen
-
-    if ($_SESSION["usertype"] == "superuser") {
+    if (isset($_SESSION["user"]) && $_SESSION["usertype"] == "superuser") {
         //Nur Superuser können neue Domains hinzufügen
         ?>
 
@@ -56,7 +56,6 @@ if ($user_logged_in) {
                     <input type="text" class="form-control" name="domainname">
                 </div>
 
-                <!-- TODO: Dropdown muss mit existierenden Domain-Admins gefüllt werden -->
                 <div class="input-group mb-3 col-lg-6">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Domain-Admin</span>
