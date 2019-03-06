@@ -5,6 +5,7 @@ TODO:
 - Buttons zum Löschen/bearbeiten/etc sollte man nur sehen, wenn man auch die Rechte hat, die Aktionen durchzuführen
 - Was passiert, wenn eine Domain hinzugefügt werden soll, die schon existiert? Oder eine Domain, die nicht dem richtigen
   Format entspricht? Wo wird die Fehlermeldung angezeigt?
+- Alle echos entfernen und durch die Fehlermeldung ersetzen
 -->
 <?php
 session_start();
@@ -22,7 +23,7 @@ ini_set('display_startup_errors', true);
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <title>ADIN - Benutzer</title>
+    <title>ADIN - Domains</title>
     <meta charset="utf-8">
 
     <!-- Stylesheets -->
@@ -68,35 +69,42 @@ ini_set('display_startup_errors', true);
             //Der Benutzer hat die Rechte, eine neue Domain hinzuzufügen
             $domain_name = $_POST["domainname"];
             $domain_admin = intval($_POST["domainadmin"]);
-            $noerror = true;
 
+            // 1. ÜBERPRÜFEN, OB DIE DOMAIN SCHON VORHANDEN IST
             $res = $conn->query("SELECT * FROM Domains_tbl WHERE DomainName = '$domain_name';");
             if ($res->num_rows == 0) {
                 //Die Domain ist noch nicht vorhanden
+                echo "Domain noch nicht vorhanden";
 
-                //1. Hinzufügen der Domain in Domains_tbl
-                $sql = "INSERT INTO Domains_tbl (DomainName) VALUES (?)";
-                $prep_stmt = $conn->prepare($sql);
+                // 2. HINZUFÜGEN DER DOMAIN IN Domains_tbl
+                $prep_stmt = $conn->prepare("INSERT INTO Domains_tbl (DomainName) VALUES (?)");
                 $prep_stmt->bind_param("s", $domain_name);
                 $res1 = $prep_stmt->execute();
                 $prep_stmt->close();
 
-                //2. Auslesen der automatisch vergebenen ID
+                // 3. AUSLESEN DER AUTOMATISCH VERGEBENEN ID
                 if ($res1) {
-                    $sql = "SELECT * FROM Domains_tbl WHERE DomainName = ?";
-                    $prep_stmt = $conn->prepare($sql);
+                    //Die Domain wurde erfolgreich in Domains_tbl hinzugefügt
+                    echo "Domain wurde hinzugefügt";
+
+                    $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ?");
                     $prep_stmt->bind_param("s", $domain_name);
-                    $res2 = $prep_stmt->execute();
+                    $prep_stmt->execute();
+                    $res2 = $prep_stmt->get_result();
                     $prep_stmt->close();
 
-                    //3. Hinzufügen der Domain mit Domain-Admin in Domains_extend_tbl
+                    // 4. HINZUFÜGEN DER DOMAIN MIT DOMAIN-ADMIN IN Domains_extend_tbl
                     if ($res2) {
-                        $domain_id = intval($res->fetch_assoc()["DomainId"]);
+                        //Die Domain-ID wurde erfolgreich ausgelesen
+                        echo "DomainId ausgelesen";
+
+                        $domain_id = intval($res2->fetch_assoc()["DomainId"]);
                         $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
-                        if ($prep_stmt) $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
-                        else echo "Error: $conn->errno // $conn->error";
+                        $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
                         $res3 = $prep_stmt->execute();
                         $prep_stmt->close();
+
+                        if ($res3) echo "Domain wurde hinzugefügt";
                     }
                 }
 
@@ -120,6 +128,7 @@ ini_set('display_startup_errors', true);
             } else {
                 //Die Domain ist schon vorhanden, kann also nicht mehr hinzugefügt werden
                 $noerror = false;
+                echo "Domain vorhanden";
             }
 
             /*
