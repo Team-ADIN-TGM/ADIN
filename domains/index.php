@@ -93,14 +93,14 @@ ini_set('display_startup_errors', true);
                     $res2 = $prep_stmt->get_result();
                     $prep_stmt->close();
 
-                    //3. Hinzufügen der Domain mit Domain-Admin in Domains_extend_tbl
+                    // 4. HINZUFÜGEN DER DOMAIN MIT DOMAIN-ADMIN IN Domains_extend_tbl
                     if ($res2) {
+                        //Die Domain-ID wurde erfolgreich ausgelesen
                         echo "DomainId ausgelesen";
 
                         $domain_id = intval($res2->fetch_assoc()["DomainId"]);
                         $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
-                        if ($prep_stmt) $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
-                        else echo "Error: $conn->errno // $conn->error";
+                        $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
                         $res3 = $prep_stmt->execute();
                         $prep_stmt->close();
 
