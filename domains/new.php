@@ -7,6 +7,7 @@ TODO
 <?php
 	session_start(); 
 	include "../connect.php";
+	include "../functions.php";
 
     //TODO: Remove, just for debugging
     // Turn on error reporting
