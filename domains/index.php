@@ -35,7 +35,6 @@ ini_set('display_startup_errors', true);
 <?php
     //Überprüfung, ob ein Benutzer eingeloggt ist
     $user_logged_in = isset($_SESSION["user"]);
-    $userid = $_SESSION["userid"];
 
 	if (isset($_POST["delete"])) {
 	    /*
@@ -200,6 +199,7 @@ ini_set('display_startup_errors', true);
     }
 
     if ($user_logged_in) {
+        $userid = $_SESSION["userid"];
 ?>
     <!-- Navigationsleiste -->
 	<nav class="navbar adin">
