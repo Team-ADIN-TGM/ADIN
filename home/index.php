@@ -26,7 +26,7 @@ TODO:
 
 </head>
 <body>
-	<?php if (isset($_SESSION["user"])): ?>
+	<?php if (isset($_SESSION["user"])) {?>
 	<!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
@@ -134,11 +134,18 @@ TODO:
 		</a>
 	</div>
 	
-	<?php else: ?>
+	<?php } else { ?>
+    <!-- Nicht angemeldet -->
+
+    <div class="container-fluid mt-3">
+        <h3 class="mb-3">Nicht angemeldet</h3>
+
+        <span class="mb-3">
+        Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+        <a href="../login/">Hier geht es zum Login</a>
+    </span>
+    </div>
 	
-	<p>Sie sind nicht angemeldet!</p>
-    <a href="../login/">Login</a>
-	
-	<?php endif; ?>
+	<?php } ?>
 </body>
 </html>
