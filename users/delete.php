@@ -7,7 +7,7 @@ TODO:
 
 <?php
 	session_start();
-	include "../connect.php";
+	require "../connect.php";
 ?>
 <!DOCTYPE html>
 <html lang="de">

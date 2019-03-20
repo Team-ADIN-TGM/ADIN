@@ -7,7 +7,14 @@ TODO:
 
 <?php
 	session_start();
-	include '../connect.php';
+	require '../connect.php';
+	require '../functions.php';
+
+    //TODO: Remove, just for debugging
+    // Turn on error reporting
+    error_reporting(E_ALL);
+    ini_set('display_errors', true);
+    ini_set('display_startup_errors', true);
 
 	/*
 	 * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
@@ -26,7 +33,21 @@ TODO:
 	
 </head>
 <body>
-	<?php if (isset($_SESSION["user"])): ?>
+<?php
+
+    $user_logged_in = isset($_SESSION["user"]);
+    if ($user_logged_in) {
+        $userid = $_SESSION["userid"];
+
+        if (isset($_POST["new"])) {
+
+        } elseif (isset($_POST["update"])) {
+
+        } elseif (isset($_POST["delete"])) {
+
+        }
+
+?>
 	<!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
@@ -78,47 +99,106 @@ TODO:
 				<th class="overview-table-content-cell">Voller Name</th>
 				<th class="overview-table-content-cell">Benutzername</th>
 				<th class="overview-table-content-cell">Email-Adresse</th>
-				<th class="overview-table-content-cell">Passwort</th>
 				<th class="overview-table-content-cell">Benutzer-Typ</th>
 				<th class="overview-table-content-cell">Berechtigt für Domains</th>
 				<th class="overview-table-button-cell"></th>
-				<th class="overview-table-button-cell"></th>
+                <th class="overview-table-button-cell"></th>
 			</tr>
 			<tr>
-				<td class="overview-table-content-cell">Markus Frank</td>
-				<td class="overview-table-content-cell">mfrank</td>
-				<td class="overview-table-content-cell">mfrank@flashbrother.net</td>
-				<td class="overview-table-content-cell">************</td>
-				<td class="overview-table-content-cell">Delegated Admin</td>
-				<td class="overview-table-content-cell">
-					flashbrother.net<br>
-					test.dns.or.at<br>
-				</td>
-				<!-- TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
-				<td class="overview-table-button-cell">
-					<a href="update.php" target="_blank">
-						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
-					</a>
-				</td>
-				<td class="overview-table-button-cell">
-					<a href="delete.php" target="_blank">
-						<img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
-					</a>
-				</td>
-			</tr>
+                <?php
+                //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
+                //TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können!
+
+                if ($_SESSION["usertype"] == "superuser") {
+                    //Alle Benutzer anzeigen
+                    $main_query = "SELECT AdminId, FullName, Username, Email, UserType FROM Admins_tbl";
+                    $main_res = $conn->query($main_query);
+
+                } else {
+                    //Delegated Admin - Nur den eigenen Benutzer anzeigen
+                    $main_query = "SELECT AdminId, FullName, Username, Email, UserType FROM Admins_tbl WHERE AdminId = $userid;";
+                    $main_res = $conn->query($main_query);
+                }
+
+                while ($row = $main_res->fetch_assoc()) {
+                    ?>
+                    <tr>
+
+                        <td class="overview-table-content-cell"><?php echo $row["FullName"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["Username"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["Email"] ?></td>
+                        <td class="overview-table-content-cell">
+                            <?php
+                                if ($row["UserType"] == "superuser") echo "Superuser";
+                                elseif ($row["UserType"] == "deladmin") echo "Delegated Admin";
+                            ?>
+                        </td>
+                        <td class="overview-table-content-cell">
+                            <?php
+                                /*
+                                 * Für Delegated Admins muss eine Liste mit allen Domains ausgelesen werden, für die sie
+                                 * Domain-Admins sind.
+                                 */
+                                if ($row["UserType"] == "deladmin") {
+                                    $adminid = $row["AdminId"];
+                                    $domains_query = "SELECT DomainAdmin, 
+                                        GROUP_CONCAT(DISTINCT DomainName ORDER BY DomainName ASC SEPARATOR '<br>') AS Domains
+                                        FROM Domains_tbl
+                                        INNER JOIN Domains_extend_tbl
+                                        ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                                        WHERE DomainAdmin = $adminid;";
+
+                                    $domains_res = $conn->query($domains_query);
+                                    echo $domains_res->fetch_assoc()["Domains"];
+                                } elseif ($row["UserType"] == "superuser") {
+                                    echo "Alle";
+                                }
+                            ?>
+                        </td>
+                        <td class="overview-table-button-cell">
+                            <a href="update.php?id=<?php echo $row["AdminId"]; ?>">
+                                <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
+                            </a>
+                        </td>
+                        <?php
+                            //Der Löschen-Button wird nur Superusern angezeigt.
+                            if (current_user_has_rights_for_user("delete", intval($row["AdminId"]))): ?>
+                                <td class="overview-table-button-cell">
+                                    <a href="delete.php?id=<?php echo $row["AdminId"]; ?>">
+                                        <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
+                                    </a>
+                                </td>
+                                <?php
+                            endif;
+                        ?>
+                    </tr>
+
+                <?php
+                }
+                ?>
 		</table>
-		
-		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
-			<img src="../img/add.png" class="mr-3">
-			Neuen Benutzer hinzufügen
-		</a>
+
+        <?php if (current_user_has_rights_for_user("new", -1)): ?>
+            <!-- Der Button zum Hinzufügen von neuen Benutzern wird nur Superusern angezeigt. -->
+            <a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
+                <img src="../img/add.png" class="mr-3">
+                Neuen Benutzer hinzufügen
+            </a>
+        <?php endif; ?>
 	</div>
-	
-	<?php else: ?>
-	
-	<p>Sie sind nicht angemeldet!</p>
-    <a href="../login/">Login</a>
-	
-	<?php endif; ?>
+
+    <?php } else { ?>
+    <!-- Nicht angemeldet -->
+
+    <div class="container-fluid mt-3">
+        <h3 class="mb-3">Nicht angemeldet</h3>
+
+        <span class="mb-3">
+            Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+            <a href="../login/">Hier geht es zum Login</a>
+        </span>
+    </div>
+
+    <?php } ?>
 </body>
 </html>

@@ -8,8 +8,8 @@ TODO:
 -->
 <?php
 session_start();
-include "../connect.php";
-include "../functions.php";
+require "../connect.php";
+require "../functions.php";
 
 //TODO: Remove, just for debugging
 // Turn on error reporting
@@ -206,7 +206,7 @@ ini_set('display_startup_errors', true);
 		<a class="navbar-brand" href="../home/">
 			<img src="../img/logo.png" id="adin-navbar-logo">
 		</a>
-		
+
 		<div>
 			<div class="navbar-item adin-navbar-item">
 				<a class="adin-navbar-link" href="../users/">
@@ -240,12 +240,12 @@ ini_set('display_startup_errors', true);
             </div>
 		</div>
 	</nav>
-	
+
 	<!-- Haupt-Container -->
 	<div class="container-fluid">
-		
+
 		<h1 class="mt-3">Domains</h1>
-		
+
 		<!-- Übersichtstabelle -->
 		<table class="overview-table">
 			<tr>
@@ -253,8 +253,8 @@ ini_set('display_startup_errors', true);
 				<th class="overview-table-content-cell">Domain-Name</th>
 				<th class="overview-table-content-cell">Domain-Admin</th>
 				<th class="overview-table-content-cell">Email-Adresse des Domain-Admins</th>
-				<th class="overview-table-button-cell"></th>
-				<th class="overview-table-button-cell"></th>
+                <th class="overview-table-button-cell"></th>
+                <th class="overview-table-button-cell"></th>
 			</tr>
             <?php
                 //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
@@ -283,16 +283,25 @@ ini_set('display_startup_errors', true);
                         <td class="overview-table-content-cell"><?php echo $row["DomainName"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["Username"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["Email"] ?></td>
-                        <td class="overview-table-button-cell">
-                            <a href="update.php?id=<?php echo $row["DomainId"]; ?>">
-                                <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
-                            </a>
-                        </td>
-                        <td class="overview-table-button-cell">
-                            <a href="delete.php?id=<?php echo $row["DomainId"]; ?>">
-                                <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
-                            </a>
-                        </td>
+                        <?php if (current_user_has_rights_for_domain("update", $row["DomainId"])): ?>
+                            <!-- Buttons zum Bearbeiten und Löschen werden nur angezeigt, wenn der Benutzer die Rechte dafür hat -->
+                            <td class="overview-table-button-cell">
+                                <a href="update.php?id=<?php echo $row["DomainId"]; ?>">
+                                    <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
+                                </a>
+                            </td>
+                        <?php
+                            endif;
+                            if (current_user_has_rights_for_domain("delete", $row["DomainId"])):
+                                ?>
+                                <td class="overview-table-button-cell">
+                                    <a href="delete.php?id=<?php echo $row["DomainId"]; ?>">
+                                        <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
+                                    </a>
+                                </td>
+                                <?php
+                            endif;
+                        ?>
                     </tr>
 
                     <?php
@@ -301,10 +310,13 @@ ini_set('display_startup_errors', true);
 
 		</table>
 
-		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
-			<img src="../img/add.png" class="mr-3">
-			Neue Domain hinzufügen
-		</a>
+        <?php if (current_user_has_rights_for_domain("new", -1)): ?>
+            <!-- Der Button zum Hinzufügen von Domains wird nur angezeigt, wenn man die Recht dafür hat -->
+            <a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
+                <img src="../img/add.png" class="mr-3">
+                Neue Domain hinzufügen
+            </a>
+        <?php endif; ?>
 	</div>
 	
 	<?php } else { ?>
@@ -314,9 +326,9 @@ ini_set('display_startup_errors', true);
         <h3 class="mb-3">Nicht angemeldet</h3>
 
         <span class="mb-3">
-        Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
-        <a href="../login/">Hier geht es zum Login</a>
-    </span>
+            Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+            <a href="../login/">Hier geht es zum Login</a>
+        </span>
     </div>
 	
 	<?php } ?>

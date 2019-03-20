@@ -1,7 +1,7 @@
 <?php
 	session_start(); 
-	include "../connect.php";
-	include "../functions.php";
+	require "../connect.php";
+	require "../functions.php";
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -122,7 +122,7 @@
                 <h3 class="mb-3">Keine Berechtigung</h3>
 
                 <span class="mb-3">
-                    Da Sie kein Superuser sind, können Sie keine neue Domain hinzufügen. Bitte wenden Sie sich dazu an
+                    Da Sie kein Superuser sind, können Sie keine Domains bearbeiten. Bitte wenden Sie sich dazu an
                     <a href="mailto:bla@wtf.com">Email</a>. <!-- TODO: Kontakt-Adresse hinzufügen -->
                 </span>
             </div>
