@@ -4,6 +4,12 @@
  * eingesetzt werden können.
  */
 
+//TODO: Remove, just for debugging
+// Turn on error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
+
 session_start();
 require "connect.php";
 
