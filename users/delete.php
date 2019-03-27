@@ -6,14 +6,15 @@ TODO:
 -->
 
 <?php
-session_start();
-require_once "../connect.php";
-
 //TODO: Remove, just for debugging
 // Turn on error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 ini_set('display_startup_errors', true);
+
+session_start();
+require_once "../connect.php";
+require_once "../functions.php";
 
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
@@ -27,42 +28,116 @@ $conn = get_database_connection();
 	<!-- Stylesheets -->
 	<link type="text/css" rel="stylesheet" href="../style/style.css">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-	
-	<!-- Scripts -->
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-	
-	
 </head>
 	
 <body>
-	<?php if (isset($_SESSION["user"])): ?>
-	<div class="container-fluid mt-3">
-		<h3 class="mb-3">Benutzer löschen</h3>
-		
-		<!-- TODO: Meldung anpassen -->
-		<span class="mb-3">
-			Sind Sie sicher, dass sie den Benutzer mfrank löschen wollen?<br>
-			Dieser Benutzer ist ein Delegated Admin. Wenn Sie ihn löschen, haben die folgenden Domains keinen Delegated Admin mehr:<br>
-			<!-- TODO: Liste der Domains -->
-		</span>
-		
-		<!-- TODO: Links müssen logischerweise noch angepasst werden -->
-		<div class="mt-3">
-			<form method="post" action="index.php" style="display: inline;">
-				<input type="hidden" name="username" value="">
-				<input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
-			</form>
-			<a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
-		</div>
-	</div>
+
+<?php
+
+//Es wird geprüft, ob der Benutzer eingeloggt ist
+$user_logged_in = isset($_SESSION["user"]); //true wenn Benutzer eingeloggt
+
+if ($user_logged_in) {
+    //Jetzt werden die Rechte geprüft
+
+    $logged_in_user = $_SESSION["userid"];
+    $user_to_delete = intval($_GET["id"]); //Die ID des zu löschenden Benutzeraccounts, übergeben per URL (delete.php?id=3)
+    $user_has_rights = current_user_has_rights_for_user("delete", $user_to_delete);
+
+    if ($user_has_rights) {
+        //Der angemeldete Benutzer hat die Rechte, um den zu löschenden Benutzer-Account zu löschen.
+        //Es müssen noch Daten über den zu löschenden Benutzer ausgelesen werden
+        $prep_stmt = $conn->prepare("SELECT FullName, Username, UserType FROM Admins_tbl WHERE AdminId = ?;");
+        $prep_stmt->bind_param("i", $user_to_delete);
+        $prep_stmt->execute();
+        $res = $prep_stmt->get_result();
+        $prep_stmt->close();
+
+        if ($res->num_rows == 1) {
+            $res_array = $res->fetch_assoc();
+            $user_to_delete_full_name = $res_array["FullName"];
+            $user_to_delete_username = $res_array["Username"];
+            $user_to_delete_user_type = $res_array["UserType"];
+
+            //Es müssen auch noch alle Domains ausgelesen werden, von denen der zu löschende Benutzer Domain-Admin ist
+            $prep_stmt = $conn->prepare("SELECT GROUP_CONCAT(DISTINCT DomainName ORDER BY DomainName ASC SEPARATOR '</li><li>') AS Domains
+                FROM Domains_tbl
+                INNER JOIN Domains_extend_tbl
+                ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                WHERE DomainAdmin = ?;");
+            $prep_stmt->bind_param("i", $user_to_delete);
+            $prep_stmt->execute();
+            $res = $prep_stmt->get_result();
+
+            $user_to_delete_domains = $res->fetch_assoc()["Domains"];
+
+            ?>
+
+            <div class="container-fluid mt-3">
+                <h3 class="mb-3">Benutzer löschen</h3>
+
+                <!-- TODO: Meldung anpassen -->
+                <span class="mb-3">
+                    Sind Sie sicher, dass sie den Benutzer <?php echo $user_to_delete_full_name; ?>
+                    (<?php echo $user_to_delete_username; ?>) löschen wollen?<br>
+                    Dieser Benutzer ist ein <?php echo (($user_to_delete_user_type == "deladmin") ? "Delegated Admin" : "Superuser") ?>.
+
+                    <?php if (!empty($user_to_delete_domains)):
+                        //Wird nur angezeigt, wenn der Benutzer Domain-Admin von mindestens einer Domain ist
+                        ?>
+                        Wenn Sie ihn löschen, haben die folgenden Domains keinen Domain-Admin mehr:
+                        <ul>
+                            <li>
+                                <?php echo $user_to_delete_domains ?>
+                            </li>
+                        </ul>
+                        Superuser können den Domains allerdings einen neuen Domain-Admin zuweisen.
+                    <?php endif; ?>
+                </span>
+
+                <!-- TODO: Links müssen logischerweise noch angepasst werden -->
+                <div class="mt-3">
+                    <form method="post" action="index.php" style="display: inline;">
+                        <input type="hidden" name="userid" value="<?php echo $user_to_delete; ?>">
+                        <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
+                    </form>
+                    <a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
+                </div>
+            </div>
+
+            <?php
+        }
+    } else {
+        //Der Benutzer hat keine Berechtigung
+        ?>
+
+        <div class="container-fluid mt-3">
+            <h3 class="mb-3">Keine Berechtigung</h3>
+
+            <span class="mb-3">
+                Da Sie kein Superuser sind, können Sie keine Benutzer-Accounts für ADIN löschen. Bitte wenden Sie sich dazu an
+                <a href="mailto:bla@wtf.com">Email</a>. <!-- TODO: Kontakt-Adresse hinzufügen -->
+            </span>
+        </div>
+
+        <?php
+    }
+} else {
+    //Der Benutzer ist nicht eingeloggt
+    ?>
+
+    <div class="container-fluid mt-3">
+        <h3 class="mb-3">Nicht angemeldet</h3>
+
+        <span class="mb-3">
+            Sie sind nicht angemeldet. Bitte melden Sie sich an, um mit ADIN zu arbeiten.<br>
+            <a href="../login/">Hier geht es zum Login</a>
+        </span>
+    </div>
+
+    <?php
+}
+?>
 	
-	<?php else: ?>
-	
-	<p>Sie sind nicht angemeldet!</p>
-	<a href="../login/">Login</a>
-	
-	<?php endif; ?>
 </body>
 </html>

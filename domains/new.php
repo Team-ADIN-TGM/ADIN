@@ -120,3 +120,4 @@ if ($user_logged_in) {
 }
 ?>
 </body>
+</html>

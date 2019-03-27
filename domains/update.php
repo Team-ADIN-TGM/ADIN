@@ -32,7 +32,7 @@ $conn = get_database_connection();
     if ($user_logged_in) {
         //Der Benutzer ist angemeldet. Es müssen die Rechte überprüft werden
 
-        if (current_user_has_rights_for_domain("edit", $domain_id)) {
+        if (current_user_has_rights_for_domain("update", $domain_id)) {
             //Der Benutzer hat die Rechte, um die Domain zu bearbeiten
 
             $prep_stmt = $conn->prepare("SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.AdminId 

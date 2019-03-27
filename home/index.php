@@ -137,7 +137,7 @@ $conn = get_database_connection();
 			</tr>
 		</table>
 		
-		<a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
+		<a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
 			<img src="../img/add.png" class="mr-3">
 			Neue Mailbox hinzufügen
 		</a>

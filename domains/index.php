@@ -316,7 +316,7 @@ $conn = get_database_connection();
 
         <?php if (current_user_has_rights_for_domain("new", -1)): ?>
             <!-- Der Button zum Hinzufügen von Domains wird nur angezeigt, wenn man die Recht dafür hat -->
-            <a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
+            <a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
                 <img src="../img/add.png" class="mr-3">
                 Neue Domain hinzufügen
             </a>

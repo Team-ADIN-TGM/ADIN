@@ -4,18 +4,18 @@ TODO:
 -->
 
 <?php
-    //TODO: Remove, just for debugging
-    // Turn on error reporting
-    error_reporting(E_ALL);
-    ini_set('display_errors', true);
-    ini_set('display_startup_errors', true);
+//TODO: Remove, just for debugging
+// Turn on error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
 
-    session_start();
-    require_once "../connect.php";
-    require_once "../functions.php";
+session_start();
+require_once "../connect.php";
+require_once "../functions.php";
 
-    //mysqli-Objekt erstellen
-    $conn = get_database_connection();
+//mysqli-Objekt erstellen
+$conn = get_database_connection();
 
 ?>
 <!DOCTYPE html>
@@ -27,8 +27,6 @@ TODO:
     <!-- Stylesheets -->
     <link type="text/css" rel="stylesheet" href="../style/style.css">
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-
-
 </head>
 
 <body>
@@ -43,11 +41,17 @@ if ($user_logged_in) {
 
     $logged_in_user = $_SESSION["userid"];
     $domain_id = intval($_GET["id"]); //Die ID der zu löschenden Domain, übergeben per URL (delete.php?id=3)
-    $user_has_rights = current_user_has_rights_for_domain($domain_id, "delete");
+    $user_has_rights = current_user_has_rights_for_domain("delete", $domain_id);
 
     if ($user_has_rights) {
+
         //Der Domain-Name muss noch aus der Datenbank ausgelesen werden
-        $res = $conn->query("SELECT DomainName FROM Domains_tbl WHERE DomainId = $domain_id;");
+        $prep_stmt = $conn->prepare("SELECT DomainName FROM Domains_tbl WHERE DomainId = ?;");
+        $prep_stmt->bind_param("i", $domain_id);
+        $prep_stmt->execute();
+        $res = $prep_stmt->get_result();
+        $prep_stmt->close();
+
         if ($res->num_rows == 1) {
             $domain_name = $res->fetch_assoc()["DomainName"];
 
@@ -106,3 +110,4 @@ if ($user_logged_in) {
 }
 ?>
 </body>
+</html>

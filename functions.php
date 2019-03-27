@@ -2,6 +2,8 @@
 /**
  * Diese Datei stellt Funktionen zur Verfügung, die zum Beispiel zum Überprüfen von Berechtigungen
  * eingesetzt werden können.
+ *
+ * Um Funktionen wie current_user_has_rights_for_*() verwenden können, muss in dem Script, in dem
  */
 
 //TODO: Remove, just for debugging
@@ -10,7 +12,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', true);
 ini_set('display_startup_errors', true);
 
-session_start();
 require_once "connect.php";
 
 //mysqli-Objekt erstellen

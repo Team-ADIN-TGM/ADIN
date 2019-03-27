@@ -45,9 +45,30 @@ $conn = get_database_connection();
         if (isset($_POST["new"])) {
 
         } elseif (isset($_POST["update"])) {
-
+            //Wenn das Passwort nicht geändert wurde, haben password und password-repeat einen leeren String als Wert
         } elseif (isset($_POST["delete"])) {
+            /*
+             * Es soll ein Benutzer-Account für ADIN gelöscht werden. Wenn das POST-Parameter delete gesetzt ist, heißt
+             * das, dass die Anfrage von delete.php kommt. Der Benutzer hat also schon bestätigt, dass die Domain
+             * gelöscht werden soll. Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer
+             * die nötigen Rechte hat.
+             */
+            $user_to_delete = $_POST["userid"];
 
+            //Überprüfung der Rechte
+            $user_has_rights = current_user_has_rights_for_user("delete", $user_to_delete);
+
+            if ($user_logged_in && $user_has_rights) {
+                //Überprüfungen abgeschlossen - Domain kann gelöscht werden
+                $prep_stmt = $conn->prepare("DELETE FROM Admins_tbl WHERE AdminId = ?;");
+                $prep_stmt->bind_param("i", intval($user_to_delete));
+                $prep_stmt->execute();
+                $aff_rows = $prep_stmt->affected_rows;
+
+                if ($aff_rows < 1) echo "Beim Löschen des Benutzers ist ein Fehler aufgetreten";
+
+                $prep_stmt->close();
+            }
         }
 
 ?>
@@ -183,7 +204,7 @@ $conn = get_database_connection();
 
         <?php if (current_user_has_rights_for_user("new", -1)): ?>
             <!-- Der Button zum Hinzufügen von neuen Benutzern wird nur Superusern angezeigt. -->
-            <a href="new.php" class="btn mt-5 adin-button overview-table-add-button">
+            <a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
                 <img src="../img/add.png" class="mr-3">
                 Neuen Benutzer hinzufügen
             </a>
