@@ -14,6 +14,9 @@ TODO:
     include "../connect.php";
     include "../functions.php";
 
+    //mysqli-Objekt erstellen
+    $conn = get_database_connection();
+
 ?>
 <!DOCTYPE html>
 <html lang="de">

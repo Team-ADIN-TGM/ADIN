@@ -6,20 +6,23 @@ TODO:
 -->
 
 <?php
-    //TODO: Remove, just for debugging
-    // Turn on error reporting
-    error_reporting(E_ALL);
-    ini_set('display_errors', true);
-    ini_set('display_startup_errors', true);
+//TODO: Remove, just for debugging
+// Turn on error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
 
-    session_start();
-    require '../connect.php';
-    require '../functions.php';
+session_start();
+require '../connect.php';
+require '../functions.php';
 
-    /*
-     * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
-     * Reagieren darauf, auslesen der Parameter, Zugriff auf die Datenbank
-     */
+//mysqli-Objekt erstellen
+$conn = get_database_connection();
+
+/*
+ * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
+ * Reagieren darauf, auslesen der Parameter, Zugriff auf die Datenbank
+ */
 ?>
 <!DOCTYPE html>
 <html lang="de">

@@ -13,6 +13,9 @@ ini_set('display_startup_errors', true);
 session_start();
 require "connect.php";
 
+//mysqli-Objekt erstellen
+$conn = get_database_connection();
+
 /****************************************************************************
  *                                ALLGEMEIN                                 *
  ****************************************************************************/
@@ -35,6 +38,8 @@ require "connect.php";
  * @return          boolean true, wenn der Benutzer die Rechte hat, sonst false
  */
 function user_has_rights_for_domain($action, $userid, $domainid) {
+    global $conn;
+
     $res = $conn->query("SELECT UserType FROM Admins_tbl WHERE AdminId = $userid;");
     $has_rights = false;
 
@@ -83,6 +88,8 @@ function current_user_has_rights_for_domain($action, $domainid) {
  * @return                  boolean true, wenn der Benutzer die Rechte hat, sonst false
  */
 function user_has_rights_for_user($action, $logged_in_user, $subject_user) {
+    global $conn;
+
     $is_superuser = false;
     $res = $conn->query("SELECT UserType FROM Admins_tbl WHERE AdminId = $logged_in_user;");
 
@@ -138,6 +145,8 @@ function current_user_has_rights_for_user($action, $subject_user) {
  * @return          boolean true, wenn der Benutzer die Rechte hat, sonst false
  */
 function user_has_rights_for_mailbox($action, $user, $mailbox) {
+    global $conn;
+
     //Überprüfung, ob der Benutzer Superuser ist
     $is_superuser = false;
     $res = $conn->query("SELECT UserType FROM Admins_tbl WHERE AdminId = $user;");
