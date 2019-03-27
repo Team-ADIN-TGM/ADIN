@@ -11,8 +11,8 @@ TODO:
     ini_set('display_startup_errors', true);
 
     session_start();
-    include "../connect.php";
-    include "../functions.php";
+    require_once "../connect.php";
+    require_once "../functions.php";
 
     //mysqli-Objekt erstellen
     $conn = get_database_connection();

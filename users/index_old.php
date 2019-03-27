@@ -7,7 +7,7 @@
 <body>
 <?php
 session_start();
-include '../connect.php';
+require_once '../connect.php';
 if(isset($_SESSION["user"])) {
 
     echo "<b>Users_tbl</b><br />";

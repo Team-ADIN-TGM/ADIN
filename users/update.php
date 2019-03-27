@@ -12,7 +12,7 @@ ini_set('display_errors', true);
 ini_set('display_startup_errors', true);
 
 session_start();
-include "../connect.php";
+require_once "../connect.php";
 
 //mysqli-Objekt erstellen
 $conn = get_database_connection();

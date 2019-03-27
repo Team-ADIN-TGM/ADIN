@@ -7,7 +7,7 @@ TODO:
 
 <?php
 session_start();
-require "../connect.php";
+require_once "../connect.php";
 
 //TODO: Remove, just for debugging
 // Turn on error reporting

@@ -1,5 +1,5 @@
 <?php
-include '../connect.php';
+require_once '../connect.php';
 
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
