@@ -143,12 +143,13 @@ $conn = get_database_connection();
         }
     } elseif (isset($_POST["update"])) {
         /*
-	     * Es soll eine Domain aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass die
-         * Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
-         * einmal die Rechte geprüft werden (nur Superuser können Domains ändern).
+	     * Es soll ein Benutzer-Account aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass
+         * die Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
+         * einmal die Rechte geprüft werden (nur Superuser können Benutzer-Accounts ändern).
 	     */
 
-        $domain_id = intval($_POST["domainid"]);
+        $userid = intval($_POST["domainid"]);
+
         if (current_user_has_rights_for_domain("update", $domain_id)) {
             $domain_name = $_POST["domainname"];
             $domain_admin = $_POST["domainadmin"];

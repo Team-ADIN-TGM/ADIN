@@ -63,6 +63,10 @@ if ($user_logged_in) {
                     <input type="text" class="form-control" name="email">
                 </div>
 
+                <!--
+                    TODO: Regex zum clientseitigen validieren von Password-Mindestanforderungen (z.B. min. eine Zahl)
+                    TODO: Sicherere Möglichkeit, Passwörter an index.php zu übermitteln!!!
+                -->
                 <div class="input-group mb-3 col-lg-6">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Passwort</span>
