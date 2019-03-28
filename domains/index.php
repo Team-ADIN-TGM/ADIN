@@ -266,12 +266,12 @@ $conn = get_database_connection();
 
                 if ($_SESSION["usertype"] == "superuser") {
                     //Alle Domains anzeigen
-                    $sql = "SELECT Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
+                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId;";
                 } else {
                     //Delegated Admin - Nur die Domains auslesen, für die der Benutzer Domain-Admin ist
-                    $sql = "SELECT Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
+                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
                     WHERE Admins_tbl.AdminId = $userid;";
@@ -283,9 +283,9 @@ $conn = get_database_connection();
                     ?>
 
                     <tr>
-                        <td class="overview-table-content-cell"><?php echo $row["DomainId"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["DomainName"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["Username"] ?></td>
+                        <td class="overview-table-content-cell"><?php echo $row["FullName"] ?></td>
                         <td class="overview-table-content-cell">
                             <a href="mailto:<?php echo $row["Email"]; ?>"><?php echo $row["Email"] ?></a>
                         </td>
