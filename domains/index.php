@@ -262,8 +262,6 @@ $conn = get_database_connection();
                 <th class="overview-table-button-cell"></th>
 			</tr>
             <?php
-                //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
-                //TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können!
 
                 if ($_SESSION["usertype"] == "superuser") {
                     //Alle Domains anzeigen

@@ -33,10 +33,11 @@ $conn = get_database_connection();
 
 <?php
     $user_logged_in = isset($_SESSION["user"]);
-    $user_to_edit_id = intval($_GET["id"]);
 
     if ($user_logged_in) {
         //Der Benutzer ist angemeldet. Es müssen die Rechte überprüft werden
+
+        $user_to_edit_id = intval($_GET["id"]);
 
         if (current_user_has_rights_for_user("update", $user_to_edit_id)) {
             //Der angemeldete Benutzer hat die Rechte, um den Benutzer zu bearbeiten
@@ -62,7 +63,6 @@ $conn = get_database_connection();
                 <div class="container-fluid mt-3">
                     <h3>Benutzerdaten ändern</h3>
 
-                    <!-- TODO: Die einzelnen Eingabefelder müssen in PHP (mittels value-Attribut) ausgefüllt werden
                          Ausnahme: Die Passwort-Eingabefelder werden nicht ausgefüllt! -->
                     <form method="POST" action="index.php">
                         <div class="input-group mb-3 col-lg-6">
@@ -86,7 +86,6 @@ $conn = get_database_connection();
                             <input type="text" class="form-control" name="email" value="<?php echo $email; ?>">
                         </div>
 
-                        <!-- TODO: Die Passwort-Felder müssen geprüft werden. Sie müssen beide ausgefüllt und gleich sein -->
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Passwort</span>
@@ -131,7 +130,7 @@ $conn = get_database_connection();
                     <h3 class="mb-3">Benutzer nicht vorhanden</h3>
 
                     <span class="mb-3">
-                        Der Benutzer mit der ID <?php echo $domain_id ?> existiert nicht.
+                        Der Benutzer mit der ID <?php echo $user_to_edit_id; ?> existiert nicht.
                     </span>
                 </div>
 

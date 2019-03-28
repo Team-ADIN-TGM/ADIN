@@ -27,10 +27,11 @@ $conn = get_database_connection();
 <body>
 <?php
     $user_logged_in = isset($_SESSION["user"]);
-    $domain_id = intval($_GET["id"]);
 
     if ($user_logged_in) {
         //Der Benutzer ist angemeldet. Es müssen die Rechte überprüft werden
+
+        $domain_id = intval($_GET["id"]);
 
         if (current_user_has_rights_for_domain("update", $domain_id)) {
             //Der Benutzer hat die Rechte, um die Domain zu bearbeiten

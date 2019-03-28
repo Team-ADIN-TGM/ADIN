@@ -1,10 +1,3 @@
-<!--
-TODO:
-- Dynamisches Auslesen der Datenbank und füllen der Tabelle
-- Setzen der Links zu delete/new/update-Seiten
-- Reagieren auf Aktionen in den delete/new/update-Seiten
--->
-
 <?php
 //TODO: Remove, just for debugging
 // Turn on error reporting
@@ -19,10 +12,6 @@ require_once '../functions.php';
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
 
-/*
- * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
- * Reagieren darauf, auslesen der Parameter, Zugriff auf die Datenbank
- */
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -255,8 +244,6 @@ $conn = get_database_connection();
 			</tr>
 			<tr>
                 <?php
-                //TODO: Hier müssen alle Domains, für die der Benutzer Rechte hat, ausgelesen und angezeigt werden
-                //TODO: Links müssen die ID der Domain enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können!
 
                 if ($_SESSION["usertype"] == "superuser") {
                     //Alle Benutzer anzeigen

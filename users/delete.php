@@ -1,10 +1,3 @@
-<!--
-TODO:
-- ID aus der URL auslesen
-- Überprüfen, ob der Benutzer die Rechte hat, um darauf zuzugreifen
-- Text mit Daten ausfüllen (wie ID, Email-Adresse)
--->
-
 <?php
 //TODO: Remove, just for debugging
 // Turn on error reporting
@@ -76,7 +69,6 @@ if ($user_logged_in) {
             <div class="container-fluid mt-3">
                 <h3 class="mb-3">Benutzer löschen</h3>
 
-                <!-- TODO: Meldung anpassen -->
                 <span class="mb-3">
                     Sind Sie sicher, dass sie den Benutzer <?php echo $user_to_delete_full_name; ?>
                     (<?php echo $user_to_delete_username; ?>) löschen wollen?<br>
@@ -95,7 +87,6 @@ if ($user_logged_in) {
                     <?php endif; ?>
                 </span>
 
-                <!-- TODO: Links müssen logischerweise noch angepasst werden -->
                 <div class="mt-3">
                     <form method="post" action="index.php" style="display: inline;">
                         <input type="hidden" name="userid" value="<?php echo $user_to_delete; ?>">
