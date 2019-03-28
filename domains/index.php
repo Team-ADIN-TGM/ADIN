@@ -1,10 +1,11 @@
 <!--
 TODO:
 - Evtl. einen Neu-laden-Button (neu laden mit F5 sendet eventuell vorhandene GET- und POST-Parameter erneut)
-- Buttons zum Löschen/bearbeiten/etc sollte man nur sehen, wenn man auch die Rechte hat, die Aktionen durchzuführen
 - Was passiert, wenn eine Domain hinzugefügt werden soll, die schon existiert? Oder eine Domain, die nicht dem richtigen
   Format entspricht? Wo wird die Fehlermeldung angezeigt?
 - Alle echos entfernen und durch die Fehlermeldung ersetzen
+- Spalte mit ID entfernen, Spalte mit Vollem Namen des Admins hinzufügen
+- In der Spalte mit Email des Admins einen Link mit "mailto:bla@wtf.com" einfügen
 -->
 <?php
 
@@ -254,9 +255,9 @@ $conn = get_database_connection();
 		<!-- Übersichtstabelle -->
 		<table class="overview-table">
 			<tr>
-				<th class="overview-table-content-cell">Domain-ID</th>
 				<th class="overview-table-content-cell">Domain-Name</th>
 				<th class="overview-table-content-cell">Domain-Admin</th>
+                <th class="overview-table-content-cell">Name des Domain-Admins</th>
 				<th class="overview-table-content-cell">Email-Adresse des Domain-Admins</th>
                 <th class="overview-table-button-cell"></th>
                 <th class="overview-table-button-cell"></th>
@@ -265,12 +266,12 @@ $conn = get_database_connection();
 
                 if ($_SESSION["usertype"] == "superuser") {
                     //Alle Domains anzeigen
-                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.Email FROM Domains_tbl
+                    $sql = "SELECT Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId;";
                 } else {
                     //Delegated Admin - Nur die Domains auslesen, für die der Benutzer Domain-Admin ist
-                    $sql = "SELECT Domains_tbl.DomainId, Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.Email FROM Domains_tbl
+                    $sql = "SELECT Domains_tbl.DomainName, Admins_tbl.Username, Admins_tbl.FullName, Admins_tbl.Email FROM Domains_tbl
                     INNER JOIN Domains_extend_tbl ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
                     LEFT JOIN Admins_tbl ON Domains_extend_tbl.DomainAdmin = Admins_tbl.AdminId
                     WHERE Admins_tbl.AdminId = $userid;";
@@ -285,7 +286,9 @@ $conn = get_database_connection();
                         <td class="overview-table-content-cell"><?php echo $row["DomainId"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["DomainName"] ?></td>
                         <td class="overview-table-content-cell"><?php echo $row["Username"] ?></td>
-                        <td class="overview-table-content-cell"><?php echo $row["Email"] ?></td>
+                        <td class="overview-table-content-cell">
+                            <a href="mailto:<?php echo $row["Email"]; ?>"><?php echo $row["Email"] ?></a>
+                        </td>
                         <?php if (current_user_has_rights_for_domain("update", $row["DomainId"])): ?>
                             <!-- Buttons zum Bearbeiten und Löschen werden nur angezeigt, wenn der Benutzer die Rechte dafür hat -->
                             <td class="overview-table-button-cell">
