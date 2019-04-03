@@ -37,7 +37,8 @@ if ($user_logged_in) {
     $user_to_delete = intval($_GET["id"]); //Die ID des zu löschenden Benutzeraccounts, übergeben per URL (delete.php?id=3)
     $user_has_rights = current_user_has_rights_for_user("delete", $user_to_delete);
 
-    if ($logged_in_user == $user_to_delete) {
+    //Benutzer dürfen sich selbst nicht löschen!
+    if ($logged_in_user != $user_to_delete) {
 
         if ($user_has_rights) {
             //Der angemeldete Benutzer hat die Rechte, um den zu löschenden Benutzer-Account zu löschen.
