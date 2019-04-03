@@ -63,7 +63,6 @@ $conn = get_database_connection();
                 <div class="container-fluid mt-3">
                     <h3>Benutzerdaten ändern</h3>
 
-                         Ausnahme: Die Passwort-Eingabefelder werden nicht ausgefüllt! -->
                     <form method="POST" action="index.php">
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
