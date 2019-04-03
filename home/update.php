@@ -38,17 +38,17 @@ $conn = get_database_connection();
 		<form method="POST" action="index.php">
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Benutzername</span>
+					<label class="input-group-text" for="username">Benutzername</label>
 				</div>
-				<input type="text" class="form-control" name="username" value="mfrank">
+				<input type="text" id="username" class="form-control" name="username" value="mfrank">
 			</div>
 			
 			<!-- TODO: Dropdown muss mit den existierenden Domains gefüllt werden -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">E-Mail-Adresse</span>
+					<label class="input-group-text" for="email">E-Mail-Adresse</label>
 				</div>
-				<input type="text" class="form-control" name="email" value="mfrank">
+				<input type="text" id="email" class="form-control" name="email" value="mfrank">
 				<span class="input-group-text input-group-text-midinput">@</span>
 				<select class="custom-select" name="usertype">
 					<option value="1">test.dns.or.at</option>
@@ -69,37 +69,37 @@ $conn = get_database_connection();
 				 Beim Abschicken müssen sie geprüft werden. Sie müssen beide ausgefüllt und gleich sein -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Passwort</span>
+					<label class="input-group-text" for="password">Passwort</label>
 				</div>
-				<input type="password" class="form-control" name="password" placeholder="Zum Ändern neues Passwort eingeben">
+				<input type="password" id="password" class="form-control" name="password" placeholder="Zum Ändern neues Passwort eingeben">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Passwort wiederholen</span>
+					<label class="input-group-text" for="password-repeat">Passwort wiederholen</label>
 				</div>
-				<input type="password" class="form-control" name="password-repeat" placeholder="Zum Ändern neues Passwort wiederholen">
+				<input type="password" id="password-repeat" class="form-control" name="password-repeat" placeholder="Zum Ändern neues Passwort wiederholen">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Weiterleiten an</span>
+					<label class="input-group-text" for="redirect">Weiterleiten an</label>
 				</div>
-				<input type="text" class="form-control" name="redirect" placeholder="Leer lassen, um Mails nicht weiterzuleiten">
+				<input type="text" id="redirect" class="form-control" name="redirect" placeholder="Leer lassen, um Mails nicht weiterzuleiten">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Kopie an</span>
+					<label class="input-group-text" for="copy">Kopie an</label>
 				</div>
-				<input type="text" class="form-control" name="copy" placeholder="Leer lassen, um keine Kopien zu senden">
+				<input type="text" id="copy" class="form-control" name="copy" placeholder="Leer lassen, um keine Kopien zu senden">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Notiz</span>
+					<label class="input-group-text" for="note">Notiz</label>
 				</div>
-				<input type="text" class="form-control" name="note" value="DER SERVER GEHT SCHON WIEDER NICHT">
+				<input type="text" id="note" class="form-control" name="note" value="DER SERVER GEHT SCHON WIEDER NICHT">
 			</div>
 			
 			<input type="submit" class="btn adin-button" name="update" value="Änderungen speichern">

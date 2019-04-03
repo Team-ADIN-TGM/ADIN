@@ -37,77 +37,95 @@ if ($user_logged_in) {
     $user_to_delete = intval($_GET["id"]); //Die ID des zu löschenden Benutzeraccounts, übergeben per URL (delete.php?id=3)
     $user_has_rights = current_user_has_rights_for_user("delete", $user_to_delete);
 
-    if ($user_has_rights) {
-        //Der angemeldete Benutzer hat die Rechte, um den zu löschenden Benutzer-Account zu löschen.
-        //Es müssen noch Daten über den zu löschenden Benutzer ausgelesen werden
-        $prep_stmt = $conn->prepare("SELECT FullName, Username, UserType FROM Admins_tbl WHERE AdminId = ?;");
-        $prep_stmt->bind_param("i", $user_to_delete);
-        $prep_stmt->execute();
-        $res = $prep_stmt->get_result();
-        $prep_stmt->close();
+    if ($logged_in_user == $user_to_delete) {
 
-        if ($res->num_rows == 1) {
-            $res_array = $res->fetch_assoc();
-            $user_to_delete_full_name = $res_array["FullName"];
-            $user_to_delete_username = $res_array["Username"];
-            $user_to_delete_user_type = $res_array["UserType"];
-
-            //Es müssen auch noch alle Domains ausgelesen werden, von denen der zu löschende Benutzer Domain-Admin ist
-            $prep_stmt = $conn->prepare("SELECT GROUP_CONCAT(DISTINCT DomainName ORDER BY DomainName ASC SEPARATOR '</li><li>') AS Domains
-                FROM Domains_tbl
-                INNER JOIN Domains_extend_tbl
-                ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
-                WHERE DomainAdmin = ?;");
+        if ($user_has_rights) {
+            //Der angemeldete Benutzer hat die Rechte, um den zu löschenden Benutzer-Account zu löschen.
+            //Es müssen noch Daten über den zu löschenden Benutzer ausgelesen werden
+            $prep_stmt = $conn->prepare("SELECT FullName, Username, UserType FROM Admins_tbl WHERE AdminId = ?;");
             $prep_stmt->bind_param("i", $user_to_delete);
             $prep_stmt->execute();
             $res = $prep_stmt->get_result();
+            $prep_stmt->close();
 
-            $user_to_delete_domains = $res->fetch_assoc()["Domains"];
+            if ($res->num_rows == 1) {
+                $res_array = $res->fetch_assoc();
+                $user_to_delete_full_name = $res_array["FullName"];
+                $user_to_delete_username = $res_array["Username"];
+                $user_to_delete_user_type = $res_array["UserType"];
 
+                //Es müssen auch noch alle Domains ausgelesen werden, von denen der zu löschende Benutzer Domain-Admin ist
+                $prep_stmt = $conn->prepare("SELECT GROUP_CONCAT(DISTINCT DomainName ORDER BY DomainName ASC SEPARATOR '</li><li>') AS Domains
+                    FROM Domains_tbl
+                    INNER JOIN Domains_extend_tbl
+                    ON Domains_tbl.DomainId = Domains_extend_tbl.DomainId
+                    WHERE DomainAdmin = ?;");
+                $prep_stmt->bind_param("i", $user_to_delete);
+                $prep_stmt->execute();
+                $res = $prep_stmt->get_result();
+
+                $user_to_delete_domains = $res->fetch_assoc()["Domains"];
+
+                ?>
+
+                <div class="container-fluid mt-3">
+                    <h3 class="mb-3">Benutzer löschen</h3>
+
+                    <span class="mb-3">
+                        Sind Sie sicher, dass sie den Benutzer <?php echo $user_to_delete_full_name; ?>
+                        (<?php echo $user_to_delete_username; ?>) löschen wollen?<br>
+                        Dieser Benutzer ist ein <?php echo(($user_to_delete_user_type == "deladmin") ? "Delegated Admin" : "Superuser") ?>
+                        .
+
+                        <?php if (!empty($user_to_delete_domains)):
+                            //Wird nur angezeigt, wenn der Benutzer Domain-Admin von mindestens einer Domain ist
+                            ?>
+                            Wenn Sie ihn löschen, haben die folgenden Domains keinen Domain-Admin mehr:
+                            <ul>
+                                <li>
+                                    <?php echo $user_to_delete_domains ?>
+                                </li>
+                            </ul>
+                            Superuser können den Domains allerdings einen neuen Domain-Admin zuweisen.
+                        <?php endif; ?>
+                    </span>
+
+                    <div class="mt-3">
+                        <form method="post" action="index.php" style="display: inline;">
+                            <input type="hidden" name="userid" value="<?php echo $user_to_delete; ?>">
+                            <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
+                        </form>
+                        <a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
+                    </div>
+                </div>
+
+                <?php
+            }
+        } else {
+            //Der Benutzer hat keine Berechtigung
             ?>
 
             <div class="container-fluid mt-3">
-                <h3 class="mb-3">Benutzer löschen</h3>
+                <h3 class="mb-3">Keine Berechtigung</h3>
 
                 <span class="mb-3">
-                    Sind Sie sicher, dass sie den Benutzer <?php echo $user_to_delete_full_name; ?>
-                    (<?php echo $user_to_delete_username; ?>) löschen wollen?<br>
-                    Dieser Benutzer ist ein <?php echo (($user_to_delete_user_type == "deladmin") ? "Delegated Admin" : "Superuser") ?>.
-
-                    <?php if (!empty($user_to_delete_domains)):
-                        //Wird nur angezeigt, wenn der Benutzer Domain-Admin von mindestens einer Domain ist
-                        ?>
-                        Wenn Sie ihn löschen, haben die folgenden Domains keinen Domain-Admin mehr:
-                        <ul>
-                            <li>
-                                <?php echo $user_to_delete_domains ?>
-                            </li>
-                        </ul>
-                        Superuser können den Domains allerdings einen neuen Domain-Admin zuweisen.
-                    <?php endif; ?>
+                    Da Sie kein Superuser sind, können Sie keine Benutzer-Accounts für ADIN löschen. Bitte wenden Sie sich dazu an
+                    <a href="mailto:bla@wtf.com">Email</a>. <!-- TODO: Kontakt-Adresse hinzufügen -->
                 </span>
-
-                <div class="mt-3">
-                    <form method="post" action="index.php" style="display: inline;">
-                        <input type="hidden" name="userid" value="<?php echo $user_to_delete; ?>">
-                        <input type="submit" class="btn btn-danger" name="delete" value="Ja, löschen">
-                    </form>
-                    <a class="btn adin-button" href="index.php">Nein, nicht löschen</a>
-                </div>
             </div>
 
             <?php
         }
     } else {
-        //Der Benutzer hat keine Berechtigung
+        //Der Benutzer möchte sich selbst löschen - das geht nicht!
         ?>
 
         <div class="container-fluid mt-3">
-            <h3 class="mb-3">Keine Berechtigung</h3>
+            <h3 class="mb-3">Sie können sich nicht selbst löschen.</h3>
 
             <span class="mb-3">
-                Da Sie kein Superuser sind, können Sie keine Benutzer-Accounts für ADIN löschen. Bitte wenden Sie sich dazu an
-                <a href="mailto:bla@wtf.com">Email</a>. <!-- TODO: Kontakt-Adresse hinzufügen -->
+                Sie versuchen, den Account zu löschen, mit dem Sie gerade angemeldet sind. Das ist nicht möglich. Bitte
+                melden Sie sich mit einem anderen Account an, um diesen Account zu löschen.
             </span>
         </div>
 

@@ -35,19 +35,19 @@ $conn = get_database_connection();
 		<form method="POST" action="index.php">
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Benutzername</span>
+					<label class="input-group-text" for="username">Benutzername</label>
 				</div>
-				<input type="text" class="form-control" name="username">
+				<input type="text" id="username" class="form-control" name="username">
 			</div>
 			
 			<!-- TODO: Dropdown muss mit den existierenden Domains gefüllt werden, für die der Benutzer Rechte hat -->
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">E-Mail-Adresse</span>
+					<label class="input-group-text" for="email">E-Mail-Adresse</label>
 				</div>
-				<input type="text" class="form-control" name="email">
+				<input type="text" id="email" class="form-control" name="email">
 				<span class="input-group-text input-group-text-midinput">@</span>
-				<select class="custom-select" name="usertype">
+				<select class="custom-select" name="emaildomain">
 					<option value="1">test.dns.or.at</option>
 					<option value="2">test1.dns.or.at</option>
 				</select>
@@ -55,7 +55,7 @@ $conn = get_database_connection();
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text"> Voller Name</span>
+					<span class="input-group-text">Voller Name</span>
 				</div>
 				<input type="text" class="form-control" name="firstname" placeholder="Vorname">
 				<input type="text" class="form-control" name="lastname" placeholder="Nachname">
@@ -63,37 +63,37 @@ $conn = get_database_connection();
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Passwort</span>
+					<label class="input-group-text" for="password">Passwort</label>
 				</div>
-				<input type="password" class="form-control" name="password">
+				<input type="password" id="password" class="form-control" name="password">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Passwort wiederholen</span>
+					<label class="input-group-text" for="password-repeat">Passwort wiederholen</label>
 				</div>
-				<input type="password" class="form-control" name="password-repeat">
+				<input type="password" id="password-repeat" class="form-control" name="password-repeat">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Weiterleiten an</span>
+					<label class="input-group-text" for="redirect">Weiterleiten an</label>
 				</div>
-				<input type="text" class="form-control" name="redirect" placeholder="Leer lassen, um Mails nicht weiterzuleiten">
+				<input type="text" id="redirect" class="form-control" name="redirect" placeholder="Leer lassen, um Mails nicht weiterzuleiten">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Kopie an</span>
+					<label class="input-group-text" for="copy">Kopie an</label>
 				</div>
-				<input type="text" class="form-control" name="copy" placeholder="Leer lassen, um keine Kopien zu senden">
+				<input type="text" id="copy" class="form-control" name="copy" placeholder="Leer lassen, um keine Kopien zu senden">
 			</div>
 			
 			<div class="input-group mb-3 col-lg-6">
 				<div class="input-group-prepend">
-					<span class="input-group-text">Notiz</span>
+					<label class="input-group-text" for="note">Notiz</label>
 				</div>
-				<input type="text" class="form-control" name="note">
+				<input type="text" id="note" class="form-control" name="note">
 			</div>
 			
 			<input type="submit" class="btn adin-button" name="insert" value="Mailbox hinzufügen">

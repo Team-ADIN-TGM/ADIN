@@ -66,44 +66,44 @@ $conn = get_database_connection();
                     <form method="POST" action="index.php">
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Voller Name</span>
+                                <label class="input-group-text" for="fullname">Voller Name</label>
                             </div>
-                            <input type="text" class="form-control" name="fullname" value="<?php echo $full_name; ?>">
+                            <input type="text" id="fullname" class="form-control" name="fullname" value="<?php echo $full_name; ?>">
                         </div>
 
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Benutzername</span>
+                                <label class="input-group-text" for="username">Benutzername</label>
                             </div>
-                            <input type="text" class="form-control" name="username" value="<?php echo $user_name; ?>">
+                            <input type="text" id="username" class="form-control" name="username" value="<?php echo $user_name; ?>">
                         </div>
 
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">E-Mail-Adresse</span>
+                                <label class="input-group-text" for="email">E-Mail-Adresse</label>
                             </div>
-                            <input type="text" class="form-control" name="email" value="<?php echo $email; ?>">
+                            <input type="text" id="email" class="form-control" name="email" value="<?php echo $email; ?>">
                         </div>
 
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Passwort</span>
+                                <label class="input-group-text" for="password">Passwort</label>
                             </div>
-                            <input type="password" class="form-control" name="password" placeholder="Zum Ändern neues Passwort eingeben">
+                            <input type="password" id="password" class="form-control" name="password" placeholder="Zum Ändern neues Passwort eingeben">
                         </div>
 
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Passwort wiederholen</span>
+                                <label class="input-group-text" for="password-repeat">Passwort wiederholen</label>
                             </div>
-                            <input type="password" class="form-control" name="password-repeat" placeholder="Zum Ändern neues Passwort wiederholen">
+                            <input type="password" id="password-repeat" class="form-control" name="password-repeat" placeholder="Zum Ändern neues Passwort wiederholen">
                         </div>
 
                         <div class="input-group mb-3 col-lg-6">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Benutzertyp</span>
+                                <label class="input-group-text" for="usertype">Benutzertyp</label>
                             </div>
-                            <select class="custom-select" name="usertype">
+                            <select id="usertype" class="custom-select" name="usertype">
                                 <option value="deladmin" <?php if ($user_type == "deladmin") echo "selected"; ?>>Delegated Admin</option>
 
                                 <!-- Nur Superuser können die Option "Superuser" sehen! -->

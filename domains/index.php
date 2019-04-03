@@ -200,9 +200,9 @@ $conn = get_database_connection();
                         echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
                     }
 
-                } elseif ($res->num_rows < 1) {
+                } elseif ($res1->num_rows < 1) {
                     echo "Domain nicht vorhanden";
-                } elseif ($res->num_rows > 1) {
+                } elseif ($res1->num_rows > 1) {
                     echo "Fehler";
                 }
 

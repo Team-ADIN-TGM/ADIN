@@ -50,16 +50,16 @@ if ($user_logged_in) {
             <form method="POST" action="index.php">
                 <div class="input-group mb-3 col-lg-6">
                     <div class="input-group-prepend">
-                        <span class="input-group-text">Domain-Name</span>
+                        <label class="input-group-text" for="domainname">Domain-Name</label>
                     </div>
-                    <input type="text" class="form-control" name="domainname">
+                    <input type="text" id="domainname" class="form-control" name="domainname">
                 </div>
 
                 <div class="input-group mb-3 col-lg-6">
                     <div class="input-group-prepend">
-                        <span class="input-group-text">Domain-Admin</span>
+                        <label class="input-group-text" for="domainadmin">Domain-Admin</label>
                     </div>
-                    <select class="custom-select" name="domainadmin">
+                    <select id="domainadmin" class="custom-select" name="domainadmin">
 
                         <?php
 
