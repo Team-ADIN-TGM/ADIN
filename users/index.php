@@ -29,7 +29,7 @@ $conn = get_database_connection();
 
     $user_logged_in = isset($_SESSION["user"]);
     if ($user_logged_in) {
-        $userid = $_SESSION["userid"];
+        $logged_in_user_id = $_SESSION["userid"];
 
         if (isset($_POST["insert"])) {
             /*
@@ -148,6 +148,15 @@ $conn = get_database_connection();
                             $prep_stmt->close();
                         }
 
+                        /*
+                         * 4. BENUTZER AUTOMATISCH AUSLOGGEN, WENN ER DEN EIGENEN ACCOUNT GEÄNDERT HAT
+                         * Das ist notwending, weil eventuell Benutzername und andere Daten in den Session-Parametern
+                         * neu gesetzt werden müssen.
+                         */
+                        if ($userid == $logged_in_user_id) {
+                            header("location: ../login/logout.php");
+                        }
+
                     } elseif ($res->num_rows == 0) {
                         echo "Benutzer nicht vorhanden";
                     } elseif ($res->num_rows > 1) {
@@ -252,7 +261,7 @@ $conn = get_database_connection();
 
                 } else {
                     //Delegated Admin - Nur den eigenen Benutzer anzeigen
-                    $main_query = "SELECT AdminId, FullName, Username, Email, UserType FROM Admins_tbl WHERE AdminId = $userid;";
+                    $main_query = "SELECT AdminId, FullName, Username, Email, UserType FROM Admins_tbl WHERE AdminId = $logged_in_user_id;";
                     $main_res = $conn->query($main_query);
                 }
 

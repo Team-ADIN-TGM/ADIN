@@ -176,28 +176,40 @@ $conn = get_database_connection();
                 if ($res1->num_rows == 1) {
                     //Die Domain ist vorhanden
 
-                    // 2. UPDATEN DES DOMAIN-NAMENS
-                    $prep_stmt = $conn->prepare("UPDATE Domains_tbl SET DomainName = ? WHERE DomainId = ?");
+                    // 2. VERFÜGBARKEIT DES DOMAIN-NAMENS ÜBERPRÜFEN
+                    $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ? AND DomainId != ?;");
                     $prep_stmt->bind_param("si", $domain_name, $domain_id);
-                    $res2 = $prep_stmt->execute();
-                    $prep_stmt->close();
+                    $prep_stmt->execute();
+                    $res2 = $prep_stmt->get_result();
 
-                    if ($res2) {
-                        //Der Domain-Name wurde aktualisiert
+                    if ($res2->num_rows == 0) {
+                        //Es sind keine anderen Domains mit diesem Domain-Namen vorhanden
 
-                        // 3. UPDATEN DES DOMAIN-ADMINS
-                        $prep_stmt = $conn->prepare("UPDATE Domains_extend_tbl SET DomainAdmin = ? WHERE DomainId = ?");
-                        $prep_stmt->bind_param("ii", $domain_admin, $domain_id);
+                        // 3. UPDATEN DES DOMAIN-NAMENS
+                        $prep_stmt = $conn->prepare("UPDATE Domains_tbl SET DomainName = ? WHERE DomainId = ?");
+                        $prep_stmt->bind_param("si", $domain_name, $domain_id);
                         $res3 = $prep_stmt->execute();
                         $prep_stmt->close();
 
-                        if (!isset($res3) || !$res3) {
-                            //Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten
-                            echo "Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten";
+                        if ($res3) {
+                            //Der Domain-Name wurde aktualisiert
+
+                            // 3. UPDATEN DES DOMAIN-ADMINS
+                            $prep_stmt = $conn->prepare("UPDATE Domains_extend_tbl SET DomainAdmin = ? WHERE DomainId = ?");
+                            $prep_stmt->bind_param("ii", $domain_admin, $domain_id);
+                            $res4 = $prep_stmt->execute();
+                            $prep_stmt->close();
+
+                            if (!isset($res4) || !$res4) {
+                                //Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten
+                                echo "Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten";
+                            }
+                        } else {
+                            //Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten
+                            echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
                         }
                     } else {
-                        //Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten
-                        echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
+                        echo "Dieser Domain-Name ist bereits vergeben!";
                     }
 
                 } elseif ($res1->num_rows < 1) {
