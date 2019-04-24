@@ -12,6 +12,8 @@ require_once '../functions.php';
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
 
+$EMAIL_REGEX = get_email_regex();
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -49,7 +51,6 @@ $conn = get_database_connection();
                 $user_type = $_POST["usertype"];
 
                 // 1. ÜBERPRÜFEN, OB DIE PASSWÖRTER PASSEN
-                // TODO: Passwort-Mindestanforderungen (z.B. min. 1 Zahl) mit RegEx überprüfen
                 if (($password == $password_repeat) && (strlen($password) >= 6)) {
 
                     // 2. ÜBERPRÜFEN, OB DER BENUTZER-ACCOUNT SCHON VORHANDEN IST
@@ -62,14 +63,22 @@ $conn = get_database_connection();
                     if ($res->num_rows == 0) {
                         //Der Benutzer ist noch nicht vorhanden
 
-                        // 2. HINZUFÜGEN DES BENUTZERS IN Admins_tbl
-                        $prep_stmt = $conn->prepare("INSERT INTO Admins_tbl (Username, FullName, Email, Password, UserType) VALUES (?, ?, ?, ?, ?);");
-                        $prep_stmt->bind_param("sssss", $username, $full_name, $email, $password, $user_type);
-                        $res1 = $prep_stmt->execute();
+                        // 3. ÜBERPRÜFEN, OB DIE EMAIL-ADRESSE DAS RICHTIGE FORMAT HAT
+                        if (preg_match($EMAIL_REGEX, $email)) {
 
-                        if ($prep_stmt->affected_rows < 1) echo "Beim Hinzufügen des Benutzers ist ein Fehler aufgetreten";
+                            // 4. HINZUFÜGEN DES BENUTZERS IN Admins_tbl
+                            $prep_stmt = $conn->prepare("INSERT INTO Admins_tbl (Username, FullName, Email, Password, UserType) VALUES (?, ?, ?, ?, ?);");
+                            $prep_stmt->bind_param("sssss", $username, $full_name, $email, $password, $user_type);
+                            $res1 = $prep_stmt->execute();
 
-                        $prep_stmt->close();
+                            if ($prep_stmt->affected_rows < 1) echo "Beim Hinzufügen des Benutzers ist ein Fehler aufgetreten";
+
+                            $prep_stmt->close();
+
+                        } else {
+                            //Die Email-Adresse entspricht nicht dem richtigen Format
+                            echo "Die Email-Adresse entspricht nicht dem richtigen Format";
+                        }
 
                     } else {
                         //Der Benutzer ist schon vorhanden, kann also nicht mehr hinzugefügt werden
@@ -117,44 +126,52 @@ $conn = get_database_connection();
                     if ($res->num_rows == 1) {
                         //Der Benutzer mit der AdminId ist vorhanden
 
-                        // 3. ÄNDERN DER DATEN
-                        if (strlen($password) != 0) {
-                            //Es wurde ein neues Passwort übergeben, das gesetzt werden soll
+                        // 3. ÜBERPRÜFEN, OB DIE EMAIL-ADRESSE DEM RICHTIGEN FORMAT ENTSPRICHT
+                        if (preg_match($EMAIL_REGEX, $email)) {
 
-                            $prep_stmt = $conn->prepare("UPDATE Admins_tbl 
-                                SET FullName = ?, Username = ?, Email = ?, Password = ?, UserType = ? 
-                                WHERE AdminId = ?;");
-                            $prep_stmt->bind_param("sssssi", $full_name, $username, $email, $password, $user_type, $userid);
+                            // 4. ÄNDERN DER DATEN
+                            if (strlen($password) != 0) {
+                                //Es wurde ein neues Passwort übergeben, das gesetzt werden soll
 
-                            if (!$prep_stmt->execute()) {
-                                //Es ist ein Fehler aufgetreten
-                                echo "Fehler: ".$prep_stmt->error;
+                                $prep_stmt = $conn->prepare("UPDATE Admins_tbl 
+                                    SET FullName = ?, Username = ?, Email = ?, Password = ?, UserType = ? 
+                                    WHERE AdminId = ?;");
+                                $prep_stmt->bind_param("sssssi", $full_name, $username, $email, $password, $user_type, $userid);
+
+                                if (!$prep_stmt->execute()) {
+                                    //Es ist ein Fehler aufgetreten
+                                    echo "Fehler: " . $prep_stmt->error;
+                                }
+
+                                $prep_stmt->close();
+                            } else {
+                                //Es wurde kein neues Passwort übergeben - es wird nicht geändert
+
+                                $prep_stmt = $conn->prepare("UPDATE Admins_tbl 
+                                    SET FullName = ?, Username = ?, Email = ?, UserType = ? 
+                                    WHERE AdminId = ?;");
+                                $prep_stmt->bind_param("ssssi", $full_name, $username, $email, $user_type, $userid);
+
+                                if (!$prep_stmt->execute()) {
+                                    //Es ist ein Fehler aufgetreten
+                                    echo "Fehler: " . $prep_stmt->error;
+                                }
+
+                                $prep_stmt->close();
                             }
 
-                            $prep_stmt->close();
+                            /*
+                             * 5. BENUTZER AUTOMATISCH AUSLOGGEN, WENN ER DEN EIGENEN ACCOUNT GEÄNDERT HAT
+                             * Das ist notwending, weil eventuell Benutzername und andere Daten in den Session-Parametern
+                             * neu gesetzt werden müssen.
+                             */
+                            if ($userid == $logged_in_user_id) {
+                                header("location: ../login/logout.php");
+                            }
+
                         } else {
-                            //Es wurde kein neues Passwort übergeben - es wird nicht geändert
-
-                            $prep_stmt = $conn->prepare("UPDATE Admins_tbl 
-                                SET FullName = ?, Username = ?, Email = ?, UserType = ? 
-                                WHERE AdminId = ?;");
-                            $prep_stmt->bind_param("ssssi", $full_name, $username, $email, $user_type, $userid);
-
-                            if (!$prep_stmt->execute()) {
-                                //Es ist ein Fehler aufgetreten
-                                echo "Fehler: ".$prep_stmt->error;
-                            }
-
-                            $prep_stmt->close();
-                        }
-
-                        /*
-                         * 4. BENUTZER AUTOMATISCH AUSLOGGEN, WENN ER DEN EIGENEN ACCOUNT GEÄNDERT HAT
-                         * Das ist notwending, weil eventuell Benutzername und andere Daten in den Session-Parametern
-                         * neu gesetzt werden müssen.
-                         */
-                        if ($userid == $logged_in_user_id) {
-                            header("location: ../login/logout.php");
+                            //Die Email-Adresse entspricht nicht dem richtigen Format
+                            echo "Die Email-Adresse entspricht nicht dem richtigen Format";
                         }
 
                     } elseif ($res->num_rows == 0) {

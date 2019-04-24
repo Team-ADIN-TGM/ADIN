@@ -75,8 +75,7 @@ if ($user_logged_in) {
                     <span class="mb-3">
                         Sind Sie sicher, dass sie den Benutzer <?php echo $user_to_delete_full_name; ?>
                         (<?php echo $user_to_delete_username; ?>) löschen wollen?<br>
-                        Dieser Benutzer ist ein <?php echo(($user_to_delete_user_type == "deladmin") ? "Delegated Admin" : "Superuser") ?>
-                        .
+                        Dieser Benutzer ist ein <?php echo(($user_to_delete_user_type == "deladmin") ? "Delegated Admin" : "Superuser") ?>.
 
                         <?php if (!empty($user_to_delete_domains)):
                             //Wird nur angezeigt, wenn der Benutzer Domain-Admin von mindestens einer Domain ist

@@ -21,6 +21,23 @@ $conn = get_database_connection();
  *                                ALLGEMEIN                                 *
  ****************************************************************************/
 
+/**
+ * Gibt die Regular Expression zur Überprüfung von Email-Adressen zurück.
+ *
+ * @return          string  Die Regular Expression als String
+ */
+function get_email_regex() {
+    return "/^([a-z0-9_-]([a-z0-9._-][a-z0-9_-])?)+@(([a-z0-9][a-z0-9-]{0,61}[a-z0-9]?\.)+([a-z0-9][a-z0-9-]{0,61}[a-z0-9]))$/i";
+}
+
+/**
+ * Gibt die Regular Expression zur Überprüfung von Domains zurück.
+ *
+ * @return          string  Die Regular Expression als String
+ */
+function get_domain_regex() {
+    return "/^([a-z0-9][a-z0-9-]{0,61}[a-z0-9]?\.)+([a-z0-9][a-z0-9-]{0,61}[a-z0-9])$/i";
+}
 
 /****************************************************************************
  *                                  DOMAINS                                 *

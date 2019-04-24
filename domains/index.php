@@ -22,6 +22,10 @@ require_once "../functions.php";
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
 
+//Regular Expression für Domains
+//siehe http://regexr.com/4cq66
+$DOMAIN_REGEX = get_domain_regex();
+
 ?>
 
 <!DOCTYPE html>
@@ -62,9 +66,14 @@ $conn = get_database_connection();
 
             if ($user_has_rights) {
                 //Überprüfungen abgeschlossen - Domain kann gelöscht werden
-                $res = $conn->query("DELETE FROM Domains_tbl WHERE DomainId = $domain_id;");
+                $prep_stmt = $conn->prepare("DELETE FROM Domains_tbl WHERE DomainId = ?;");
+                $prep_stmt->bind_param("i", $domain_id);
+                $res = $prep_stmt->execute();
+                $prep_stmt->close();
+
                 if (!$res) echo "Beim Löschen der Domain ist ein Fehler aufgetreten";
             }
+
         } elseif (isset($_POST["insert"])) {
             /*
              * Es soll eine Domain hinzugefügt werden. Wenn das POST-Parameter insert gesetzt ist, heißt das, dass die von
@@ -78,62 +87,75 @@ $conn = get_database_connection();
                 $domain_admin = intval($_POST["domainadmin"]);
 
                 // 1. ÜBERPRÜFEN, OB DIE DOMAIN SCHON VORHANDEN IST
-                //TODO: Überprüfen, ob Domain der Regex entspricht
-                $res = $conn->query("SELECT * FROM Domains_tbl WHERE DomainName = '$domain_name';");
+                $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ?;");
+                $prep_stmt->bind_param("s", $domain_name);
+                $prep_stmt->execute();
+                $res = $prep_stmt->get_result();
+                $prep_stmt->close();
+
                 if ($res->num_rows == 0) {
                     //Die Domain ist noch nicht vorhanden
 
-                    // 2. HINZUFÜGEN DER DOMAIN IN Domains_tbl
-                    $prep_stmt = $conn->prepare("INSERT INTO Domains_tbl (DomainName) VALUES (?)");
-                    $prep_stmt->bind_param("s", $domain_name);
-                    $res1 = $prep_stmt->execute();
-                    $prep_stmt->close();
+                    // 2. ÜBERPRÜFEN, OB DIE DOMAIN DAS RICHTIGE FORMAT HAT
+                    if (preg_match($DOMAIN_REGEX, $domain_name)) {
 
-                    // 3. AUSLESEN DER AUTOMATISCH VERGEBENEN ID
-                    if ($res1) {
-                        //Die Domain wurde erfolgreich in Domains_tbl hinzugefügt
-
-                        $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ?");
+                        // 3. HINZUFÜGEN DER DOMAIN IN Domains_tbl
+                        $prep_stmt = $conn->prepare("INSERT INTO Domains_tbl (DomainName) VALUES (?)");
                         $prep_stmt->bind_param("s", $domain_name);
-                        $prep_stmt->execute();
-                        $res2 = $prep_stmt->get_result();
+                        $res1 = $prep_stmt->execute();
                         $prep_stmt->close();
 
-                        // 4. HINZUFÜGEN DER DOMAIN MIT DOMAIN-ADMIN IN Domains_extend_tbl
-                        if ($res2) {
-                            //Die Domain-ID wurde erfolgreich ausgelesen
+                        // 4. AUSLESEN DER AUTOMATISCH VERGEBENEN ID
+                        if ($res1) {
+                            //Die Domain wurde erfolgreich in Domains_tbl hinzugefügt
 
-                            $domain_id = intval($res2->fetch_assoc()["DomainId"]);
-                            $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
-                            $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
-                            $res3 = $prep_stmt->execute();
+                            $prep_stmt = $conn->prepare("SELECT * FROM Domains_tbl WHERE DomainName = ?");
+                            $prep_stmt->bind_param("s", $domain_name);
+                            $prep_stmt->execute();
+                            $res2 = $prep_stmt->get_result();
                             $prep_stmt->close();
 
-                            if (!$res3) echo "Domain wurde nicht hinzugefügt";
+                            // 5. HINZUFÜGEN DER DOMAIN MIT DOMAIN-ADMIN IN Domains_extend_tbl
+                            if ($res2) {
+                                //Die Domain-ID wurde erfolgreich ausgelesen
+
+                                $domain_id = intval($res2->fetch_assoc()["DomainId"]);
+                                $prep_stmt = $conn->prepare("INSERT INTO Domains_extend_tbl (DomainId, DomainAdmin) VALUES (?, ?)");
+                                $prep_stmt->bind_param("ii", $domain_id, $domain_admin);
+                                $res3 = $prep_stmt->execute();
+                                $prep_stmt->close();
+
+                                if (!$res3) echo "Domain wurde nicht hinzugefügt";
+                            } else {
+                                //Die Domain ID wurde nicht ausgelesen
+                                echo "Die Domain-ID konnte nicht ausgelesen werden";
+                            }
                         } else {
-                            //Die Domain ID wurde nicht ausgelesen
-                            echo "Die Domain-ID konnte nicht ausgelesen werden";
+                            //Die Domain konnte nicht in Domains_tbl hinzugefügt werden
+                            echo "Domain konnte nicht hinzugefügt werden";
                         }
+
+                        if (!$res3 || !isset($res3)) {
+                            /*
+                             * Fehlerfall - einer der Datenbankzugriffe ist fehlgeschlagen
+                             * Es darf natürlich keine "halbe Domain" vorhanden sein (also eine Domain, die zwar in der Tabelle
+                             * Domains_tbl, aber nicht in Domains_extend_tbl hinzugefügt wurde). Die Domain muss also wieder
+                             * aus Domains_tbl gelöscht werden.
+                             */
+                            $sql = "DELETE FROM Domains_tbl WHERE DomainName = ?";
+                            $prep_stmt = $conn->prepare($sql);
+                            $prep_stmt->bind_param("s", $domain_name);
+                            $res = $prep_stmt->execute();
+                            $prep_stmt->close();
+
+                            echo "Es ist ein Fehler aufgetreten<br>";
+                            echo($res ? "Die Domain wurde erfolgreich gelöscht<br>" : "Die Domain konnte nicht gelöscht werden!<br>");
+                            echo $conn->errno . " // " . $conn->error;
+                        }
+
                     } else {
-                        //Die Domain konnte nicht in Domains_tbl hinzugefügt werden
-                        echo "Domain konnte nicht hinzugefügt werden";
-                    }
-
-                    if (!$res3 || !isset($res3)) {
-                        /*
-                         * Fehlerfall - einer der Datenbankzugriffe ist fehlgeschlagen
-                         * Es darf natürlich keine "halbe Domain" vorhanden sein (also eine Domain, die zwar in der Tabelle
-                         * Domains_tbl, aber nicht in Domains_extend_tbl hinzugefügt wurde). Die Domain muss also wieder
-                         * aus Domains_tbl gelöscht werden.
-                         */
-                        $sql = "DELETE FROM Domains_tbl WHERE DomainName = ?";
-                        $prep_stmt = $conn->prepare($sql);
-                        $prep_stmt->bind_param("s", $domain_name);
-                        $res = $prep_stmt->execute();
-
-                        echo "Es ist ein Fehler aufgetreten<br>";
-                        echo ($res ? "Die Domain wurde erfolgreich gelöscht<br>" : "Die Domain konnte nicht gelöscht werden!<br>");
-                        echo $conn->errno." // ".$conn->error;
+                        //Die Domain wird von der Regular Expression nicht gematcht - sie ist ungültig
+                        echo "Die Domain entspricht nicht dem richtigen Format";
                     }
 
                 } else {
@@ -141,20 +163,15 @@ $conn = get_database_connection();
                     echo "Domain bereits vorhanden";
                 }
 
-                /*
-                 * TODO:
-                 * - Überprüfung des Domain-Namens, ob er dem richtigen Format entspricht (evtl. mit Regex?)
-                 *   --> STANDARDISIERT!!! Keine eigene RegEx schreiben!
-                 */
-
             } else {
+                //Der Benutzer hat nicht die nötigen Rechte, um die Domain hinzuzufügen
                 echo "Keine Rechte";
             }
         } elseif (isset($_POST["update"])) {
             /*
-             * Es soll ein Benutzer-Account aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass
+             * Es soll eine Domain aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass
              * die Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
-             * einmal die Rechte geprüft werden (nur Superuser können Benutzer-Accounts ändern).
+             * einmal die Rechte geprüft werden (nur Superuser können Domains ändern).
              */
 
             $domain_id = intval($_POST["domainid"]);
@@ -181,33 +198,42 @@ $conn = get_database_connection();
                     $prep_stmt->bind_param("si", $domain_name, $domain_id);
                     $prep_stmt->execute();
                     $res2 = $prep_stmt->get_result();
+                    $prep_stmt->close();
 
                     if ($res2->num_rows == 0) {
                         //Es sind keine anderen Domains mit diesem Domain-Namen vorhanden
 
-                        // 3. UPDATEN DES DOMAIN-NAMENS
-                        $prep_stmt = $conn->prepare("UPDATE Domains_tbl SET DomainName = ? WHERE DomainId = ?");
-                        $prep_stmt->bind_param("si", $domain_name, $domain_id);
-                        $res3 = $prep_stmt->execute();
-                        $prep_stmt->close();
+                        // 3. FORMAT DES DOMAIN-NAMENS ÜBERPRÜFEN
+                        if (preg_match($DOMAIN_REGEX, $domain_name)) {
 
-                        if ($res3) {
-                            //Der Domain-Name wurde aktualisiert
-
-                            // 3. UPDATEN DES DOMAIN-ADMINS
-                            $prep_stmt = $conn->prepare("UPDATE Domains_extend_tbl SET DomainAdmin = ? WHERE DomainId = ?");
-                            $prep_stmt->bind_param("ii", $domain_admin, $domain_id);
-                            $res4 = $prep_stmt->execute();
+                            // 4. UPDATEN DES DOMAIN-NAMENS
+                            $prep_stmt = $conn->prepare("UPDATE Domains_tbl SET DomainName = ? WHERE DomainId = ?");
+                            $prep_stmt->bind_param("si", $domain_name, $domain_id);
+                            $res3 = $prep_stmt->execute();
                             $prep_stmt->close();
 
-                            if (!isset($res4) || !$res4) {
-                                //Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten
-                                echo "Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten";
+                            if ($res3) {
+                                //Der Domain-Name wurde aktualisiert
+
+                                // 5. UPDATEN DES DOMAIN-ADMINS
+                                $prep_stmt = $conn->prepare("UPDATE Domains_extend_tbl SET DomainAdmin = ? WHERE DomainId = ?");
+                                $prep_stmt->bind_param("ii", $domain_admin, $domain_id);
+                                $res4 = $prep_stmt->execute();
+                                $prep_stmt->close();
+
+                                if (!isset($res4) || !$res4) {
+                                    //Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten
+                                    echo "Beim Aktualisieren des Domain-Admins ist ein Fehler aufgetreten";
+                                }
+                            } else {
+                                //Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten
+                                echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
                             }
+
                         } else {
-                            //Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten
-                            echo "Beim Aktualisieren des Domain-Namens ist ein Fehler aufgetreten";
+                            echo "Die Domain entspricht nicht dem richtigen Format";
                         }
+
                     } else {
                         echo "Dieser Domain-Name ist bereits vergeben!";
                     }
