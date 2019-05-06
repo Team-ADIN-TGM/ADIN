@@ -74,6 +74,7 @@ $DOMAIN_REGEX = get_domain_regex();
              * die Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
              * einmal die Rechte geprüft werden.
              */
+
         }
 
 ?>
@@ -82,7 +83,7 @@ $DOMAIN_REGEX = get_domain_regex();
 		<a class="navbar-brand" href="../home/">
 			<img src="../img/logo.png" id="adin-navbar-logo">
 		</a>
-		
+
 		<div>
 			<div class="navbar-item adin-navbar-item">
 				<a class="adin-navbar-link" href="../users/">
@@ -116,22 +117,39 @@ $DOMAIN_REGEX = get_domain_regex();
             </div>
 		</div>
 	</nav>
-	
+
 	<!-- Haupt-Container -->
 	<div class="container-fluid">
-		
+
 		<h1 class="mt-3">Mailboxen</h1>
-		
+
 		<!-- Zur Auswahl der Domain, deren Mailboxen angezeigt werden sollen -->
 		<!-- TODO: Links, es dürfen nur die Domains angezeigt werden für die der Benutzer Rechte
 		hat (bei Delegated Admins) -->
 		<div class="dropdown">
 			<button class="btn adin-button dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				Domain auswählen
+                <?php
+                    //Der DomainName der ausgewählten Domain soll angezeigt werden
+
+                    if (isset($_GET["domainid"])) {
+                        $prep_stmt = $conn->prepare("SELECT DomainName FROM Domains_tbl WHERE DomainId = ?;");
+                        $prep_stmt->bind_param("i", $_GET["domainid"]);
+                        $prep_stmt->execute();
+                        $res = $prep_stmt->get_result();
+                        $prep_stmt->close();
+
+                        if ($res && $res->num_rows == 1) {
+                            echo $res->fetch_assoc()["DomainName"];
+                        }
+                        $res->close();
+                    } else {
+                        echo "Domain auswählen";
+                    }
+                ?>
 			</button>
 			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <?php
-
+                    //Alle Domains, für die der Benutzer Rechte hat, müssen ins Dropdown eingefügt werden
                     if ($usertype == "superuser") {
                         //Der Benutzer ist Superuser und hat Rechte für alle Domains - alle existierenden Domains laden
                         $res = $conn->query("SELECT DomainId, DomainName FROM Domains_tbl;");
@@ -147,9 +165,11 @@ $DOMAIN_REGEX = get_domain_regex();
 
                     if ($res) {
                         while ($row = $res->fetch_assoc()) {
+                            $did = $row["DomainId"];
+                            $dn = $row["DomainName"];
                             ?>
 
-                            <a class="dropdown-item" href="?domainid=<?php echo $row["DomainId"]; ?>">
+                            <a class="dropdown-item<?php if ($did == $_GET["domainid"]) echo " active"; ?>" href="?domainid=<?php echo $row["DomainId"]; ?>">
                                 <?php echo $row["DomainName"]; ?>
                             </a>
 
@@ -160,52 +180,120 @@ $DOMAIN_REGEX = get_domain_regex();
                 ?>
 			</div>
 		</div>
-		
-		<!-- Übersichtstabelle 
-			TODO: Aus der Datenbank auslesen
-			- Die Domain wird entweder als GET-Parameter übergeben, oder es wird einfach die erste aus der Datenbank genommen
-			- Es muss trotzdem noch geprüft werden, ob der Benutzer Zugriffsrechte hat, damit er nicht irgendwelche Domains abfragen kann
-		-->
-		<table class="overview-table">
-			<tr>
-				<th class="overview-table-content-cell">Benutzername</th>
-				<th class="overview-table-content-cell">Voller Name</th>
-				<th class="overview-table-content-cell">Email-Adresse</th>
-				<th class="overview-table-content-cell">Domain</th>
-				<th class="overview-table-content-cell">Passwort</th>
-				<th class="overview-table-content-cell">Weiterleiten an</th>
-				<th class="overview-table-content-cell">Kopie an</th>
-				<th class="overview-table-content-cell">Notiz</th>
-				<th class="overview-table-button-cell"></th>
-				<th class="overview-table-button-cell"></th>
-			</tr>
-			<tr>
-				<td class="overview-table-content-cell">mfrank</td>
-				<td class="overview-table-content-cell">Markus Frank</td>
-				<td class="overview-table-content-cell">mfrank@flashbrother.net</td>
-				<td class="overview-table-content-cell">flashbrother.net</td>
-				<td class="overview-table-content-cell">************</td>
-				<td class="overview-table-content-cell">mfrank@student.tgm.ac.at</td>
-				<td class="overview-table-content-cell">mfrank@aon.at</td>
-				<td class="overview-table-content-cell">Nur zu Testzwecken</td>
-				<!-- TODO: Links müssen die ID der Mailbox enthalten, damit die Daten aus der Datenbank ausgelesen/gelöscht werden können! -->
-				<td class="overview-table-button-cell">
-					<a href="update.php" target="_blank">
-						<img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
-					</a>
-				</td>
-				<td class="overview-table-button-cell">
-					<a href="delete.php" target="_blank">
-						<img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
-					</a>
-				</td>
-			</tr>
-		</table>
-		
-		<a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
-			<img src="../img/add.png" class="mr-3">
-			Neue Mailbox hinzufügen
-		</a>
+
+        <?php
+            if (isset($_GET["domainid"])) {
+                $domainid = $_GET["domainid"];
+
+                //Es muss herausgefunden werden, ob der User die Rechte hat, um auf die Mailboxen der Domain zuzugreifen
+                $user_has_rights_for_domain = false;
+                if ($usertype == "superuser") {
+                    //Superuser haben auf jeden Fall die Rechte, um die Mailboxen aller Domains anzuzeigen
+                    $user_has_rights_for_domain = true;
+
+                } else {
+                    //Delegated Admins können nur die Domains anzeigen, deren Admin sie sind
+                    $prep_stmt = $conn->prepare("SELECT DomainAdmin FROM Domains_extend_tbl WHERE DomainId = ?;");
+                    $prep_stmt->bind_param("i", $domainid);
+                    $prep_stmt->execute();
+                    $res = $prep_stmt->get_result();
+                    $prep_stmt->close();
+
+                    if ($res && $res->num_rows == 1 && $res->fetch_assoc()["DomainAdmin"] == $userid) {
+                        $user_has_rights_for_domain = true;
+                    }
+                }
+
+                if ($user_has_rights_for_domain) {
+                    ?>
+
+                    <!-- Übersichtstabelle
+                        TODO: Aus der Datenbank auslesen
+                        - Die Domain wird entweder als GET-Parameter übergeben, oder es wird einfach die erste aus der Datenbank genommen
+                        - Es muss trotzdem noch geprüft werden, ob der Benutzer Zugriffsrechte hat, damit er nicht irgendwelche Domains abfragen kann
+                    -->
+                    <table class="overview-table">
+                        <tr>
+                            <th class="overview-table-content-cell">Benutzername</th>
+                            <th class="overview-table-content-cell">Voller Name</th>
+                            <th class="overview-table-content-cell">Email-Adresse</th>
+                            <th class="overview-table-content-cell">Weiterleiten an</th>
+                            <th class="overview-table-content-cell">Kopie an</th>
+                            <th class="overview-table-content-cell">Notiz</th>
+                            <th class="overview-table-button-cell"></th>
+                            <th class="overview-table-button-cell"></th>
+                        </tr>
+
+                        <?php
+                            //TODO: Weiterleitungen und "Kopie an" auslesen!
+
+                            $prep_stmt = $conn->prepare("SELECT UserId, Username, FullName, Email, AdminNote, Postmaster 
+                                FROM Users_tbl 
+                                INNER JOIN Users_extend_tbl ON Users_tbl.UserId = Users_extend_tbl.UserId 
+                                WHERE Users_tbl.DomainId = <Domain-ID>;");
+                            $prep_stmt->bind_param("i", $domainid);
+                            $prep_stmt->execute();
+                            $res = $prep_stmt->get_result();
+                            $prep_stmt->close();
+
+                            while ($row = $res->fetch_assoc()) {
+                                $uid = $row["UserId"];
+                                $un = $row["Username"];
+                                $fn = $row["FullName"];
+                                $em = $row["Email"];
+                                $an = $row["AdminNote"];
+                                $pm = $row["Postmaster"];
+
+                                ?>
+                                <tr<?php if ($pm) echo " class='mailbox-postmaster'"; ?> >
+                                    <td class="overview-table-content-cell"><?php echo $un; ?></td>
+                                    <td class="overview-table-content-cell"><?php echo $fn; ?></td>
+                                    <td class="overview-table-content-cell"><?php echo $em; ?></td>
+                                    <td class="overview-table-content-cell">(keine Weiterleitung)</td>
+                                    <td class="overview-table-content-cell">(keine Weiterleitung)</td>
+                                    <td class="overview-table-content-cell"><?php echo $an; ?></td>
+
+                                    <td class="overview-table-button-cell">
+                                        <a href="update.php?<?php echo $uid; ?>" target="_blank">
+                                            <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
+                                        </a>
+                                    </td>
+                                    <td class="overview-table-button-cell">
+                                        <a href="delete.php?<?php echo $uid; ?>" target="_blank">
+                                            <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?
+                            }
+                        ?>
+
+                    </table>
+
+                    <a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
+                        <img src="../img/add.png" class="mr-3">
+                        Neue Mailbox hinzufügen
+                    </a>
+
+            <?php
+                } else {
+                    //Der Benutzer hat keine Rechte, um die Mailboxen anzuzeigen - Fehlermeldung
+                    ?>
+
+                    <div class="container-fluid mt-3">
+                        <h3 class="mb-3">Keine Berechtigung</h3>
+
+                        <span class="mb-3">
+                            Da Sie weder Superuser noch der Domain-Admin sind, können Sie die Mailboxen dieser Domain
+                            nicht ansehen. Bitte wenden Sie sich an <a href="mailto:bla@wtf.com">Email</a>.
+                            <!-- TODO: Kontakt-Adresse hinzufügen -->
+                        </span>
+                    </div>
+
+                    <?php
+                }
+            }
+        ?>
 	</div>
 	
 	<?php } else { ?>
