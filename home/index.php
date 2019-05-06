@@ -6,8 +6,6 @@ TODO:
 -->
 
 <?php
-session_start();
-require_once '../connect.php';
 
 //TODO: Remove, just for debugging
 // Turn on error reporting
@@ -15,13 +13,17 @@ error_reporting(E_ALL);
 ini_set('display_errors', true);
 ini_set('display_startup_errors', true);
 
+session_start();
+require_once "../connect.php";
+require_once "../functions.php";
+
 //mysqli-Objekt erstellen
 $conn = get_database_connection();
 
-/*
- * TODO: Überprüfen, ob das Parameter insert/update/delete gesetzt ist
- * Reagieren darauf, auslesen der Parameter, Zugriff auf die Datenbank
- */
+//Regular Expression für Domains
+//siehe http://regexr.com/4cq66
+$DOMAIN_REGEX = get_domain_regex();
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -40,7 +42,41 @@ $conn = get_database_connection();
 
 </head>
 <body>
-	<?php if (isset($_SESSION["user"])) {?>
+
+<?php
+    //Überprüfung, ob ein Benutzer eingeloggt ist
+    $user_logged_in = isset($_SESSION["user"]);
+
+    if ($user_logged_in) {
+        $userid = $_SESSION["userid"];
+        $usertype = $_SESSION["usertype"];
+
+        /****************************************************************************
+         * BEHANDELN VON AKTIONEN AUS DEN SEITEN new.php, update.php UND delete.php *
+         ****************************************************************************/
+        if (isset($_POST["delete"])) {
+            /*
+             * Es soll eine Mailbox gelöscht werden. Wenn das POST-Parameter delete gesetzt ist, heißt das, dass die Anfrage
+             * von delete.php kommt. Der Benutzer hat also schon bestätigt, dass die Mailbox gelöscht werden soll.
+             * Aus Sicherheitsgründen muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen Rechte hat.
+             */
+
+        } elseif (isset($_POST["insert"])) {
+            /*
+             * Es soll eine Mailbox hinzugefügt werden. Wenn das POST-Parameter insert gesetzt ist, heißt das, dass die
+             * Anfrage von new.php kommt. Es muss trotzdem noch einmal geprüft werden, ob der Benutzer die nötigen
+             * Rechte hat.
+             */
+
+        } elseif (isset($_POST["update"])) {
+            /*
+             * Es soll eine Mailbox aktualisiert werden. Wenn das POST-Parameter update gesetzt ist, heißt das, dass
+             * die Anfrage von update.php kommt. Der Benutzer hat die Änderungen also schon bestätigt. Trotzdem müssen noch
+             * einmal die Rechte geprüft werden.
+             */
+        }
+
+?>
 	<!-- Navigationsleiste -->
 	<nav class="navbar adin">
 		<a class="navbar-brand" href="../home/">
@@ -94,8 +130,34 @@ $conn = get_database_connection();
 				Domain auswählen
 			</button>
 			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-				<a class="dropdown-item" href="?domain=flashbrother.net">flashbrother.net</a>
-				<a class="dropdown-item" href="?domain=flashbrother.net">test.dns.or.at</a>
+                <?php
+
+                    if ($usertype == "superuser") {
+                        //Der Benutzer ist Superuser und hat Rechte für alle Domains - alle existierenden Domains laden
+                        $res = $conn->query("SELECT DomainId, DomainName FROM Domains_tbl;");
+                    } else {
+                        //Der Benutzer ist Delegated Admin - nur Domains laden, für die er Rechte hat
+                        $prep_stmt = $conn->prepare("SELECT DomainId, DomainName 
+                            FROM Domains_tbl NATURAL JOIN Domains_extend_tbl 
+                            WHERE Domains_extend_tbl.DomainAdmin = ?;");
+                        $prep_stmt->bind_param("i", $userid);
+                        $res = $prep_stmt->execute();
+                        $prep_stmt->close();
+                    }
+
+                    if ($res) {
+                        while ($row = $res->fetch_assoc()) {
+                            ?>
+
+                            <a class="dropdown-item" href="?domainid=<?php echo $row["DomainId"]; ?>">
+                                <?php echo $row["DomainName"]; ?>
+                            </a>
+
+                            <?php
+                        }
+                    }
+
+                ?>
 			</div>
 		</div>
 		
