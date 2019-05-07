@@ -302,9 +302,11 @@ $DOMAIN_REGEX = get_domain_regex();
                                         </a>
                                     </td>
                                     <td class="overview-table-button-cell">
-                                        <a href="delete.php?<?php echo $uid; ?>" target="_blank">
-                                            <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
-                                        </a>
+                                        <?php if (!$pom): ?>
+                                            <a href="delete.php?<?php echo $uid; ?>" target="_blank">
+                                                <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
+                                            </a>
+                                        <?php endif; ?>
                                     </td>
                                     </tr>
                                     <?php
