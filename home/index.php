@@ -297,13 +297,13 @@ $DOMAIN_REGEX = get_domain_regex();
                                     <td class="overview-table-content-cell"><?php echo $an; ?></td>
 
                                     <td class="overview-table-button-cell">
-                                        <a href="update.php?<?php echo $uid; ?>" target="_blank">
+                                        <a href="update.php?id=<?php echo $uid; ?>" target="_blank">
                                             <img src="../img/edit.png" class="overview-table-edit-button" alt="Bearbeiten">
                                         </a>
                                     </td>
                                     <td class="overview-table-button-cell">
                                         <?php if (!$pm): ?>
-                                            <a href="delete.php?<?php echo $uid; ?>" target="_blank">
+                                            <a href="delete.php?id=<?php echo $uid; ?>" target="_blank">
                                                 <img src="../img/delete.png" class="overview-table-delete-button" alt="Löschen">
                                             </a>
                                         <?php endif; ?>
@@ -315,7 +315,7 @@ $DOMAIN_REGEX = get_domain_regex();
 
                             </table>
 
-                            <a href="new.php" class="btn mt-5 mb-5 adin-button overview-table-add-button">
+                            <a href="new.php?domainid=<?php echo $domainid; ?>" class="btn mt-5 mb-5 adin-button overview-table-add-button">
                                 <img src="../img/add.png" class="mr-3">
                                 Neue Mailbox hinzufügen
                             </a>
