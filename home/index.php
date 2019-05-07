@@ -28,7 +28,7 @@ $DOMAIN_REGEX = get_domain_regex();
 <!DOCTYPE html>
 <html lang="de">
 <head>
-	<title>ADIN - Benutzer</title>
+	<title>ADIN - Mailboxen</title>
 	<meta charset="utf-8">
 	
 	<!-- Stylesheets -->
