@@ -205,12 +205,13 @@ $DOMAIN_REGEX = get_domain_regex();
                         //Laden aller Domains, für die der Benutzer Rechte hat
                         if ($usertype == "superuser") {
                             //Der Benutzer ist Superuser und hat Rechte für alle Domains - alle existierenden Domains laden
-                            $res = $conn->query("SELECT DomainId, DomainName FROM Domains_tbl;");
+                            $res = $conn->query("SELECT DomainId, DomainName FROM Domains_tbl ORDER BY DomainName;");
                         } else {
                             //Der Benutzer ist Delegated Admin - nur Domains laden, für die er Rechte hat
                             $prep_stmt = $conn->prepare("SELECT DomainId, DomainName 
                                 FROM Domains_tbl NATURAL JOIN Domains_extend_tbl 
-                                WHERE Domains_extend_tbl.DomainAdmin = ?;");
+                                WHERE Domains_extend_tbl.DomainAdmin = ?
+                                ORDER BY DomainName;");
                             $prep_stmt->bind_param("i", $userid);
                             $prep_stmt->execute();
                             $res = $prep_stmt->get_result();
@@ -267,7 +268,8 @@ $DOMAIN_REGEX = get_domain_regex();
                                 $prep_stmt = $conn->prepare("SELECT Users_tbl.UserId, Username, FullName, Email, AdminNote, Postmaster 
                                         FROM Users_tbl 
                                         INNER JOIN Users_extend_tbl ON Users_tbl.UserId = Users_extend_tbl.UserId 
-                                        WHERE Users_tbl.DomainId = ?;");
+                                        WHERE Users_tbl.DomainId = ?
+                                        ORDER BY Postmaster DESC, Username ASC;");
                                 $prep_stmt->bind_param("i", $domainid);
                                 $prep_stmt->execute();
                                 $res = $prep_stmt->get_result();
